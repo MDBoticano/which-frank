@@ -4,26 +4,12 @@ import React, { useState, useEffect } from 'react';
 import FrankLyrics from './data/FrankLyrics';
 
 /* Helper functions */
-import { getRandomIndex } from './utilities/randomIndex';
+import { getRandomIndex, getUniqueValues } from './utilities/helperFuncs';
 
 /* Components */
 import GuessForm from './components/GuessForm'
 
-/**
- * Returns an array of strings of all unique values
- * @param {array} array - array of objects to search
- * @param {string} key - what unique values to get
- */
-const getUniqueValues = (array, key) => {
-  const uniqueValues = [];
-  array.forEach((element) => {
-    const keyValue = element[key];
-    if (!uniqueValues.includes(keyValue)) {
-      uniqueValues.push(keyValue);
-    }
-  })
-  return uniqueValues;
-}
+
 
 const App = () => {
   /* App component state */
@@ -57,6 +43,8 @@ const App = () => {
     else {
       setStatusMessage("wrong")
     }
+
+    // then get another lyric
   }
 
   return (
