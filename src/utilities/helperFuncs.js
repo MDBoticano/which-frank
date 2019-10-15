@@ -1,7 +1,8 @@
 /**
- * Returns an array of all unique values for a given object key
+ * Returns an array of all unique values for a given object key in an object
+ * array.
  * @param {array} array - array of objects to search
- * @param {string} key - what unique values to get
+ * @param {string} key - key for the values to retreive
  */
 export const getUniqueValues = (array, key) => {
   const uniqueValues = [];
@@ -10,44 +11,64 @@ export const getUniqueValues = (array, key) => {
     if (!uniqueValues.includes(keyValue)) {
       uniqueValues.push(keyValue);
     }
-  })
+  });
   return uniqueValues;
-}
-
-/**
- * Generates a random integer between two numbers in a range
- * @param {number} max - the maximum possible exclusive value. In most cases,
- * this defaults to the array's length
- * @param {number} min - the minimum possible inclusive value; defaults to 0
- */
-export const getRandomIndex = (max, min = 0) => {
-  let rangeMax = max;
-  let rangeMin = min;
-  /* swap min and max if min is bigger than max */
-  if (rangeMax < rangeMin) {
-    [rangeMax, rangeMin] = [rangeMin, rangeMax];
-  }
-  return Math.floor((Math.random() * (rangeMax - rangeMin)) + rangeMin);
 };
 
 /**
- * Creates an array of ordered indices from 0 to a (number - 1)
- * example: getOrderedIndices(3) ==> [0, 1, 2]
- * note: uses ES6 spread operator & keys() function
- * @param {number} maxNumExclusive - what number to end at, exlusive
+ * Generates a random integer between two numbers in a range. Uses ES6
+ * destructuring for swapping values.
+ * @param {number} maximum - maximum possible exclusive value
+ * @param {number} minimum - minimum possible inclusive value (defaults to 0)
  */
-export const getOrderedIndices = (maxNumExclusive) => {
-  if (Number.isInteger(maxNumExclusive) && maxNumExclusive > 0) {
-    return [...Array(maxNumExclusive).keys()];
-  }
-  return [];
-}
+export const getRandomIndex = (maximum, minimum = 0) => {
+  let [max, min] = [maximum, minimum];
 
+  // Swap min and max if min is bigger than max to correct ranges
+  if (max < min) {
+    [max, min] = [min, max];
+  }
+
+  const index = Math.floor((Math.random() * (max - min)) + min);
+
+  return index;
+};
 
 /**
- * Creates an array of indices randomly ordered
+ * Creates an array of integers ordered from 0 to (maxNumExclusive - 1). Uses
+ * ES6 spread operator and keys() function.
+ * @param {number} maxNum - whole number for the end of the range (exlusive)
  */
-// Should this use getOrderedIndices to generate the array itself?
-export const randomizeOrderedIndices = (indicesArray) => {
+export const getOrderedIndices = (maxNum) => {
+  if (Number.isInteger(maxNum) && maxNum > 0) {
+    return [...Array(maxNum).keys()];
+  }
+  return [];
+};
 
-}
+/**
+ * Makes an array from 0 to maxNum (exclusive) and shuffles the numbers.
+ * @param {maxNum} number - positive integer for range of indices [0, maxNum)
+ */
+export const shuffleIndices = (maxNum) => {
+  const orderedIndices = getOrderedIndices(maxNum);
+
+  const numberOfIndices = orderedIndices.length;
+  if (numberOfIndices === 0) return [];
+  if (numberOfIndices === 1) return orderedIndices;
+
+  // Durstenfeld shuffle a deep copy of the ordered array.
+  const shuffledIndices = [...orderedIndices];
+  for (let i = numberOfIndices; i > 0;) {
+    const randomIndex = getRandomIndex(i);
+
+    // retrive and swap the end value with the random index value
+    const endValue = shuffledIndices[i - 1];
+    shuffledIndices[i - 1] = shuffledIndices[randomIndex];
+    shuffledIndices[randomIndex] = endValue;
+
+    i -= i;
+  }
+
+  return shuffledIndices;
+};

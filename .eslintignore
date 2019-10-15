@@ -3,3 +3,6 @@ build
 
 # Files
 src/serviceWorker.js
+
+# Test files
+src/*/*.test.js

@@ -46,4 +46,9 @@ describe('the function getOrderedIndices...', () => {
   })
 })
 
-
+describe('the function randomizeOrderedIndices...', () => {
+  it('returns an array', () => {
+    const result = helpers.shuffleIndices();
+    expect(Array.isArray(result)).toBe(true);
+  });
+})
