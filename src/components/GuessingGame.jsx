@@ -1,40 +1,41 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-
 import GuessButtons from './GuessButtons';
 import GuessResult from './GuessResult';
 
-const GuessingGame = ({ 
-  activeLyric,
-  artistsList,
-  setNextLyric,
-}) => {
-  const [guess, setGuess] = useState('');
+const GuessingGame = ({ activeLyric, artistsList, setNextLyric }) => {
+  const [result, setResult] = useState('');
   const [scoreArray, setScoreArray] = useState([]);
 
-  const submitGuess = (artist) => {
-    setGuess(artist)
+  const nextLyric = () => {
+    setResult('');
+    setNextLyric(activeLyric);
   };
 
-  const nextLyric = (lyric) => {
-    setGuess('');
-    setNextLyric(lyric);
+  const addScore = (score) => { setScoreArray([...scoreArray, score]); };
+
+  const submitGuess = (guess) => {
+    if (guess === activeLyric.artistName) {
+      setResult('correct');
+      addScore(1);
+    } else {
+      setResult('wrong');
+    }
   };
 
-  const addScore = (score) => {
-    setScoreArray([...scoreArray, score]);
+  const sumReducer = (arr) => {
+    if (arr.length === 0) return 0;
+    const sum = arr.reduce((a, b) => a + b);
+    return sum;
   };
 
   return (
     <div className="GuessingGame">
-      { guess && 
-        <GuessResult 
-          guess={guess}
-          activeLyric={activeLyric}
-          setNextLyric={nextLyric}
-          score={scoreArray}
-          addScore={addScore}
-        /> }
+      <GuessResult
+        result={result}
+        getNextLyric={nextLyric}
+        score={sumReducer(scoreArray)}
+      />
       <GuessButtons artists={artistsList} submitGuess={submitGuess} />
     </div>
   );
@@ -47,9 +48,9 @@ GuessingGame.propTypes = {
     artistName: PropTypes.string.isRequired,
     albumName: PropTypes.string.isRequired,
     albumReleaseDate: PropTypes.string.isRequired,
-  }),
+  }).isRequired,
   artistsList: PropTypes.arrayOf(PropTypes.string).isRequired,
   setNextLyric: PropTypes.func.isRequired,
-}
+};
 
 export default GuessingGame;

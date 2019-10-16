@@ -9,8 +9,6 @@ import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
 /* Components */
 import LoadingScreen from './components/LoadingScreen';
 import GuessingGame from './components/GuessingGame';
-// import GuessButtons from './components/GuessButtons';
-// import GuessResult from './components/GuessResult';
 
 const App = () => {
   /* App component state */
@@ -20,7 +18,6 @@ const App = () => {
   const [activeLyric, setActiveLyric] = useState(null);
   const [lyricsOrder, setLyricsOrder] = useState([]);
   const [uniqueArtists, setUniqueArtists] = useState([]);
-  
 
   /* Set initial state once data has loaded */
   useEffect(() => {
@@ -58,8 +55,6 @@ const App = () => {
     setActiveLyric(allLyrics[indexNext]);
   };
 
- 
-
   const displayGame = () => {
     if (!isPlaying) {
       return (
@@ -78,7 +73,7 @@ const App = () => {
         <p>
           {activeLyric && activeLyric.songLyric}
         </p>
-        <GuessingGame 
+        <GuessingGame
           activeLyric={activeLyric}
           artistsList={uniqueArtists}
           setNextLyric={setNextActiveLyric}
