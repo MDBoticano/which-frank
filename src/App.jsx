@@ -7,10 +7,13 @@ import FrankLyrics from './data/FrankLyrics';
 import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
 
 /* Components */
-import GuessForm from './components/GuessForm';
+import LoadingScreen from './components/LoadingScreen';
+import GuessButtons from './components/GuessButtons';
 
 const App = () => {
   /* App component state */
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [allLyrics, setAllLyrics] = useState([]);
   const [activeLyric, setActiveLyric] = useState(null);
   const [lyricsOrder, setLyricsOrder] = useState([]);
@@ -22,6 +25,9 @@ const App = () => {
   useEffect(() => {
     const lyricsLength = FrankLyrics.length;
     if (lyricsLength > 0) {
+      /* data is finished loading, prompt to play instead */
+      setIsLoading(false);
+
       /* Set the allLyrics' state to the imported lyrics */
       setAllLyrics(FrankLyrics);
 
@@ -63,17 +69,40 @@ const App = () => {
     setNextActiveLyric();
   };
 
+  const displayGame = () => {
+    if (!isPlaying) {
+      return (
+        <button
+          type="button"
+          className="playButton"
+          onClick={() => setIsPlaying(true)}
+        >
+          Play
+        </button>
+      );
+    }
+
+    return (
+      <div className="Game">
+        <p> 
+          {activeLyric && activeLyric.songLyric} 
+        </p>
+        <div className="status">
+          {statusMessage}
+        </div>
+        <p className="score">
+          score:
+          {scoreArray.length > 0 && scoreArray.reduce((a, b) => a + b)}
+        </p>
+        <GuessButtons artists={uniqueArtists} submitGuess={submitGuess} />
+      </div>
+    );
+  };
+
   return (
     <div className="App">
-      {activeLyric && activeLyric.songLyric}
-      <div className="status">
-        {statusMessage}
-      </div>
-      <p className="score">
-        score:
-        {scoreArray.length > 0 && scoreArray.reduce((a, b) => a + b)}
-      </p>
-      <GuessForm artists={uniqueArtists} submitGuess={submitGuess} />
+      <LoadingScreen showComponent={isLoading} />
+      {displayGame(isPlaying)}
     </div>
   );
 };
