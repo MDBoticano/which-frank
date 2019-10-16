@@ -8,7 +8,9 @@ import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
 
 /* Components */
 import LoadingScreen from './components/LoadingScreen';
-import GuessButtons from './components/GuessButtons';
+import GuessingGame from './components/GuessingGame';
+// import GuessButtons from './components/GuessButtons';
+// import GuessResult from './components/GuessResult';
 
 const App = () => {
   /* App component state */
@@ -17,9 +19,8 @@ const App = () => {
   const [allLyrics, setAllLyrics] = useState([]);
   const [activeLyric, setActiveLyric] = useState(null);
   const [lyricsOrder, setLyricsOrder] = useState([]);
-  const [scoreArray, setScoreArray] = useState([]);
   const [uniqueArtists, setUniqueArtists] = useState([]);
-  const [statusMessage, setStatusMessage] = useState('');
+  
 
   /* Set initial state once data has loaded */
   useEffect(() => {
@@ -57,17 +58,7 @@ const App = () => {
     setActiveLyric(allLyrics[indexNext]);
   };
 
-  const submitGuess = (artist) => {
-    if (artist === activeLyric.artistName) {
-      setStatusMessage('correct');
-      setScoreArray([...scoreArray, 1]);
-    } else {
-      setStatusMessage('wrong');
-      setScoreArray([...scoreArray, 0]);
-    }
-
-    setNextActiveLyric();
-  };
+ 
 
   const displayGame = () => {
     if (!isPlaying) {
@@ -84,17 +75,14 @@ const App = () => {
 
     return (
       <div className="Game">
-        <p> 
-          {activeLyric && activeLyric.songLyric} 
+        <p>
+          {activeLyric && activeLyric.songLyric}
         </p>
-        <div className="status">
-          {statusMessage}
-        </div>
-        <p className="score">
-          score:
-          {scoreArray.length > 0 && scoreArray.reduce((a, b) => a + b)}
-        </p>
-        <GuessButtons artists={uniqueArtists} submitGuess={submitGuess} />
+        <GuessingGame 
+          activeLyric={activeLyric}
+          artistsList={uniqueArtists}
+          setNextLyric={setNextActiveLyric}
+        />
       </div>
     );
   };
