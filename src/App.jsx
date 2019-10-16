@@ -70,9 +70,7 @@ const App = () => {
 
     return (
       <div className="Game">
-        <p>
-          {activeLyric && activeLyric.songLyric}
-        </p>
+
         <GuessingGame
           activeLyric={activeLyric}
           artistsList={uniqueArtists}

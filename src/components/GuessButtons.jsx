@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const GuessButtons = ({ artists, submitGuess }) => {
+const GuessButtons = ({ result, artists, submitGuess }) => {
   const makeButtons = (artistsList) => {
     const artistButtons = artistsList.map((artist) => (
       <button type="submit" key={artist} onClick={() => submitGuess(artist)}>
@@ -11,6 +11,10 @@ const GuessButtons = ({ artists, submitGuess }) => {
     return artistButtons;
   };
 
+  if (result !== '') {
+    return null;
+  }
+
   return (
     <div className="user-guess-buttons">
       {makeButtons(artists)}
@@ -19,6 +23,7 @@ const GuessButtons = ({ artists, submitGuess }) => {
 };
 
 GuessButtons.propTypes = {
+  result: PropTypes.string.isRequired,
   artists: PropTypes.arrayOf(PropTypes.string).isRequired,
   submitGuess: PropTypes.func.isRequired,
 };

@@ -6,10 +6,12 @@ const GuessResult = React.memo(({ result, getNextLyric, score }) => {
 
   return (
     <div className="GuessResult">
-      You were
-      {result}
+      <p className="result">
+        You were&nbsp;
+        {result}
+      </p>
       <p className="score">
-        score:
+        score:&nbsp;
         {score}
       </p>
       <button type="button" onClick={() => getNextLyric()}>

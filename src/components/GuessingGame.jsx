@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import GuessButtons from './GuessButtons';
 import GuessResult from './GuessResult';
+import LyricDetails from './LyricDetails';
 
 const GuessingGame = ({ activeLyric, artistsList, setNextLyric }) => {
   const [result, setResult] = useState('');
@@ -29,14 +30,26 @@ const GuessingGame = ({ activeLyric, artistsList, setNextLyric }) => {
     return sum;
   };
 
+  if (!activeLyric) {
+    return null;
+  }
+
   return (
     <div className="GuessingGame">
+      <p>
+        {activeLyric.songLyric}
+      </p>
+      <LyricDetails result={result} activeLyric={activeLyric} />
       <GuessResult
         result={result}
         getNextLyric={nextLyric}
         score={sumReducer(scoreArray)}
       />
-      <GuessButtons artists={artistsList} submitGuess={submitGuess} />
+      <GuessButtons
+        result={result}
+        artists={artistsList}
+        submitGuess={submitGuess}
+      />
     </div>
   );
 };
