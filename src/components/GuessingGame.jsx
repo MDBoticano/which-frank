@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { sumReducer } from '../utilities/helperFuncs';
 import PropTypes from 'prop-types';
 import GuessButtons from './GuessButtons';
 import GuessResult from './GuessResult';
@@ -22,12 +23,6 @@ const GuessingGame = ({ activeLyric, artistsList, setNextLyric }) => {
     } else {
       setResult('wrong');
     }
-  };
-
-  const sumReducer = (arr) => {
-    if (arr.length === 0) return 0;
-    const sum = arr.reduce((a, b) => a + b);
-    return sum;
   };
 
   if (!activeLyric) {

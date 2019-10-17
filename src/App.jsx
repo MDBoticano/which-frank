@@ -48,11 +48,27 @@ const App = () => {
   // get next lyric in the shuffle order
   const setNextActiveLyric = () => {
     // get index of activeLyric's index in allLyrics
+    // FIXME: rename variables to be more descriptive
     const indexActive = allLyrics.findIndex((lyric) => lyric === activeLyric);
     const indexInOrder = lyricsOrder.indexOf(indexActive);
-    const indexNext = lyricsOrder[indexInOrder + 1];
 
-    setActiveLyric(allLyrics[indexNext]);
+    /* what to do when out of next lyrics? */
+    /* for now, immediately start loop over */
+    if (indexInOrder + 1 < allLyrics.length ) {
+      const indexNext = lyricsOrder[indexInOrder + 1];
+      setActiveLyric(allLyrics[indexNext]);
+    } else {
+      console.log('repeat');
+
+      /* shuffle */
+      const newOrder = shuffleIndices(allLyrics.length);
+      setLyricsOrder(newOrder);
+
+      /* make the next lyric the first lyric of the new order */
+      setActiveLyric(allLyrics[newOrder[0]]);
+
+      /* reset score: unable to from here, have to do in <GuessingGame /> */
+    }
   };
 
   // Show the prompt to play the game or the game itself

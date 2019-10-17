@@ -1,4 +1,14 @@
 /**
+ * Reduces an array to the sum of all its values
+ * @param {[number]} numberArray - array of numbers to sum up
+ */
+export const sumReducer = (numberArray) => {
+  if (numberArray.length === 0) return 0;
+  const sum = numberArray.reduce((a, b) => a + b);
+  return sum;
+};
+
+/**
  * Returns an array of all unique values for a given object key in an object
  * array.
  * @param {array} array - array of objects to search
