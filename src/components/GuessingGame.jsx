@@ -10,7 +10,7 @@ const GuessingGame = ({ activeLyric, artistsList, setNextLyric }) => {
 
   const nextLyric = () => {
     setResult('');
-    setNextLyric(activeLyric);
+    setNextLyric();
   };
 
   const addScore = (score) => { setScoreArray([...scoreArray, score]); };

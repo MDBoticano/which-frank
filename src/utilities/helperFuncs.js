@@ -59,15 +59,13 @@ export const shuffleIndices = (maxNum) => {
 
   // Durstenfeld shuffle a deep copy of the ordered array.
   const shuffledIndices = [...orderedIndices];
-  for (let i = numberOfIndices; i > 0;) {
+  for (let i = numberOfIndices; i > 0; i -= 1) {
     const randomIndex = getRandomIndex(i);
 
     // retrive and swap the end value with the random index value
     const endValue = shuffledIndices[i - 1];
     shuffledIndices[i - 1] = shuffledIndices[randomIndex];
     shuffledIndices[randomIndex] = endValue;
-
-    i -= i;
   }
 
   return shuffledIndices;

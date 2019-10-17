@@ -8,7 +8,13 @@ const LyricDetails = React.memo(({ result, activeLyric }) => {
 
   return (
     <div className="LyricDetails">
-      <p>
+      <p className="lyric-songName">
+        {activeLyric.songName}
+      </p>
+      <p className="lyric-artistName">
+        {activeLyric.artistName}
+      </p>
+      <p className="lyric-albumName">
         {activeLyric.albumName}
         &nbsp;
         {`(${activeLyric.albumReleaseDate})`}

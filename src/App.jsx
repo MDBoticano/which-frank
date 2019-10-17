@@ -55,6 +55,7 @@ const App = () => {
     setActiveLyric(allLyrics[indexNext]);
   };
 
+  // Show the prompt to play the game or the game itself
   const displayGame = () => {
     if (!isPlaying) {
       return (
@@ -69,14 +70,11 @@ const App = () => {
     }
 
     return (
-      <div className="Game">
-
-        <GuessingGame
-          activeLyric={activeLyric}
-          artistsList={uniqueArtists}
-          setNextLyric={setNextActiveLyric}
-        />
-      </div>
+      <GuessingGame
+        activeLyric={activeLyric}
+        artistsList={uniqueArtists}
+        setNextLyric={setNextActiveLyric}
+      />
     );
   };
 
