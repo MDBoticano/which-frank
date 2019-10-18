@@ -80,3 +80,24 @@ export const shuffleIndices = (maxNum) => {
 
   return shuffledIndices;
 };
+
+/**
+ * Returns a new array ordered based on passed in array of indices
+ * @param {array} originalArray - original ordered array to reorder
+ * @param {[number]} newOrder - array of new oredered indices
+ */
+export const reorderArray = (originalArray, newOrder) => {
+  /* FIXME: need more checks to make sure that newOrder unique vals == orig array length */
+  if (originalArray.length !== newOrder.length) {
+    return originalArray;
+  }
+  const newArray = [];
+  for (let i = 0, newOrderLen = newOrder.length; i < newOrderLen; i += 1) {
+    newArray.push(originalArray[newOrder[i]]);
+  }
+  return newArray;
+};
+
+/**
+ * TODO: combine all of the above shuffling steps into one function
+ */

@@ -6,7 +6,9 @@ import FrankLyrics from './data/FrankLyrics';
 
 /* Helper functions */
 // import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
-import { getUniqueValues, sumReducer } from './utilities/helperFuncs';
+import { 
+  getUniqueValues, shuffleIndices, reorderArray, sumReducer, 
+} from './utilities/helperFuncs';
 
 /* ------------------------------- Components ------------------------------- */
 /* Eventually, these components will become their own set of components */
@@ -127,6 +129,7 @@ const reduceScore = (scoreArray) => {
 const resetGame = () => {
   props.setPage(GAME);
   props.setScore([]);
+  props.reshuffleLyrics();
 }
 
 /* --- End Helpers: Score --- */
@@ -155,8 +158,17 @@ const App = () => {
   /* state */
   const [page, setPage] = useState(LOADING);
   const [allLyrics, setAllLyrics] = useState([]);
+  const [shuffledLyrics, setShuffledLyrics] = useState([]);
   const [allArtists, setAllArtists] = useState([]);
   const [score, setScore] = useState([]);
+
+  /* helpers */
+  const reshuffleLyrics = () => {
+    const shuffledLyricsOrder = shuffleIndices(allLyrics.length);
+    // console.log('new order:', shuffledLyricsOrder);
+    const newShuffledLyrics = reorderArray(FrankLyrics, shuffledLyricsOrder);
+    setShuffledLyrics(newShuffledLyrics);
+  }
 
   /* load lyrics from 'backend' */
   useEffect(() => {
@@ -164,14 +176,20 @@ const App = () => {
     if (lyricsLength > 0) {
       setPage(HOME);
 
-      // use the retrieved lyrics
       setAllLyrics(FrankLyrics);
+
+      // shuffle and set the retrieved lyrics
+      const shuffledLyricsOrder = shuffleIndices(lyricsLength);
+      // console.log('first order:', shuffledLyricsOrder);
+      const newShuffledLyrics = reorderArray(FrankLyrics, shuffledLyricsOrder);      
+      setShuffledLyrics(newShuffledLyrics);
 
       // get list of all artists
       const uniqueArtists = getUniqueValues(FrankLyrics, "artistName");
       setAllArtists(uniqueArtists);
     }
   }, []);
+
 
   return (
     <div className="App">
@@ -201,7 +219,8 @@ const App = () => {
                 setPage={setPage}
                 score={score}
                 setScore={setScore}
-                allLyrics={allLyrics}
+                // allLyrics={allLyrics}
+                allLyrics={shuffledLyrics}
                 allArtists={allArtists}
               />
             );
@@ -211,6 +230,7 @@ const App = () => {
                 setPage={setPage}
                 score={score}
                 setScore={setScore}
+                reshuffleLyrics={reshuffleLyrics}
               />
             );
           default: 
