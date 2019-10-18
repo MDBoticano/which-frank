@@ -6,7 +6,7 @@ import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
 /* Helper functions */
 // import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
-import { sumReducer } from './utilities/helperFuncs';
+import { getUniqueValues, sumReducer } from './utilities/helperFuncs';
 
 /* ------------------------------- Components ------------------------------- */
 /* Eventually, these components will become their own set of components */
@@ -41,21 +41,77 @@ const Home = (props) => {
 
 /* ---------- Page: Game ---------- */
 const Game = (props) => {
+  /* ----- State: Game ----- */
+  const [activeLyric, setActiveLyric] = useState({});
+  // const [lyricsOrder, setLyricsOrder] = useState([]); // prop from App?
+  const [numGuesses, setNumGuesses] = useState(props.score.length);
+  const [scorePrompt, setScorePrompt] = useState(false); 
+
+  /* --- End State: Game --- */
+
   /* ----- Helpers: Game ----- */
   const addScore = (value) => {
     props.setScore([...props.score, value]);
   };
+
+  const showScorePrompt = () => {
+    setScorePrompt(true);
+  }
+
+  const makeGuessButtons = (artistsList) => {
+    const artistsButtons = artistsList.map((artist) => (
+      <button type="submit" key={artist} onClick={() => checkGuess(artist)}>
+        {artist}
+      </button>
+    ));
+    return artistsButtons;
+  }
+
+  const checkGuess = (guess) => {
+    if (guess === activeLyric.artistName) {
+      console.log('correct');
+      addScore(1);
+    } else {
+      console.log('incorrect');
+      addScore(0);
+    }
+    const nextIndex = numGuesses + 1;
+    if (nextIndex === props.allLyrics.length) {
+      showScorePrompt();
+    } else {
+      setNumGuesses(nextIndex);
+      setActiveLyric(props.allLyrics[nextIndex]);
+    }
+  }
   /* --- End Helpers: Game --- */
+
+  /* ----- Hooks: Game ----- */
+  useEffect(() => {
+    if (props.allLyrics.length > 0) {
+      setActiveLyric(props.allLyrics[0]);
+    } 
+  }, [props.allLyrics]);
+  /* --- End Hooks: Game --- */
+
+  if (scorePrompt) {
+    return (
+      <div className="Game">
+        All Done!
+        <button type="button" onClick={() => props.setPage(SCORE)}>
+          View Score
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="Game">
       Game
-      <button type="button" onClick={() => addScore(1)}>
-        Correct
-      </button>
-      <button type="button" onClick={() => addScore(0)}>
-        Wrong
-      </button>
+      <div className="ActiveLyric">
+        Lyric:
+        {activeLyric.songLyric}
+      </div>
+      {makeGuessButtons(props.allArtists)}
     </div>
   );
 };
@@ -97,6 +153,7 @@ const App = () => {
   /* state */
   const [page, setPage] = useState(LOADING);
   const [allLyrics, setAllLyrics] = useState([]);
+  const [allArtists, setAllArtists] = useState([]);
   const [score, setScore] = useState([]);
 
   /* load lyrics from 'backend' */
@@ -104,18 +161,25 @@ const App = () => {
     const lyricsLength = FrankLyrics.length;
     if (lyricsLength > 0) {
       setPage(HOME);
+
+      // use the retrieved lyrics
       setAllLyrics(FrankLyrics);
+
+      // get list of all artists
+      const uniqueArtists = getUniqueValues(FrankLyrics, "artistName");
+      setAllArtists(uniqueArtists);
+
     }
   }, []);
 
   return (
     <div className="App">
       {/* shouldn't use this Nav once routing is set up */}
-      <div className="Nav">
+      {/* <div className="Nav">
         <button type="button" onClick={() => setPage(HOME)}>Home</button>
         <button type="button" onClick={() => setPage(GAME)}>Play</button>
         <button type="button" onClick={() => setPage(SCORE)}>Score</button>
-      </div>
+      </div> */}
       {(() => {
         switch(page) {
           case LOADING:
@@ -137,6 +201,7 @@ const App = () => {
                 score={score}
                 setScore={setScore}
                 allLyrics={allLyrics}
+                allArtists={allArtists}
               />
             );
           case SCORE:
