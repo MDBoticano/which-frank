@@ -1,103 +1,155 @@
 import React, { useState, useEffect } from 'react';
 
 /* data imported, since no backend */
-import FrankLyrics from './data/FrankLyrics';
+// import FrankLyrics from './data/FrankLyrics';
+import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
 /* Helper functions */
-import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
+// import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
+import { sumReducer } from './utilities/helperFuncs';
 
-/* Components */
-import LoadingScreen from './components/LoadingScreen';
-import GuessingGame from './components/GuessingGame';
+/* ------------------------------- Components ------------------------------- */
+/* Eventually, these components will become their own set of components */
+
+/* -------------------- Pages -------------------- */
+// CONSTs
+const LOADING = 'loading';
+const HOME = 'home';
+const GAME = 'game';
+const SCORE = 'score';
+
+// Loading
+const Loading = () => {
+  return (
+    <div className="Loading">
+      ...loading
+    </div>
+  );
+};
+
+// Home
+const Home = (props) => {
+  return (
+    <div className="Home">
+      Home
+      <button type="button" onClick={() => props.setPage(GAME)}>
+        Let's Play!
+      </button>
+    </div>
+  );
+};
+
+/* ---------- Page: Game ---------- */
+const Game = (props) => {
+  /* ----- Helpers: Game ----- */
+  const addScore = (value) => {
+    props.setScore([...props.score, value]);
+  };
+  /* --- End Helpers: Game --- */
+
+  return (
+    <div className="Game">
+      Game
+      <button type="button" onClick={() => addScore(1)}>
+        Correct
+      </button>
+      <button type="button" onClick={() => addScore(0)}>
+        Wrong
+      </button>
+    </div>
+  );
+};
+/* -------- End Page: Game -------- */
+
+/* ---------- Page: Score ---------- */
+const Score = (props) => {
+/* ----- Helpers: Score ----- */
+const reduceScore = (scoreArray) => {
+   /* Note: import sumReducer in component */
+  const numCorrect = sumReducer(scoreArray);
+  const maxCorrect = scoreArray.length;
+  return `You score ${numCorrect} out of ${maxCorrect}`;
+};
+
+/* --- End Helpers: Score --- */
+
+  return (
+    <div className="Score">
+      <p>
+        Score:
+        {reduceScore(props.score)}
+      </p>
+      <button type="button" onClick={() => props.setPage(HOME)}>
+        Home
+      </button>
+      <button type="button" onClick={() => props.setPage(GAME)}>
+        Play Again
+      </button>
+    </div>
+  );
+};
+/* -------- End Page: Score -------- */
+/* ------------------ End Pages ------------------ */
+
+/* ----------------------------- End Components ----------------------------- */
 
 const App = () => {
-  /* App component state */
-  const [isLoading, setIsLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
+  /* state */
+  const [page, setPage] = useState(LOADING);
   const [allLyrics, setAllLyrics] = useState([]);
-  const [activeLyric, setActiveLyric] = useState(null);
-  const [lyricsOrder, setLyricsOrder] = useState([]);
-  const [uniqueArtists, setUniqueArtists] = useState([]);
+  const [score, setScore] = useState([]);
 
-  /* Set initial state once data has loaded */
+  /* load lyrics from 'backend' */
   useEffect(() => {
     const lyricsLength = FrankLyrics.length;
     if (lyricsLength > 0) {
-      /* data is finished loading, prompt to play instead */
-      setIsLoading(false);
-
-      /* Set the allLyrics' state to the imported lyrics */
+      setPage(HOME);
       setAllLyrics(FrankLyrics);
-
-      /* Generate an order for the lyrics to appear in */
-      const shuffledOrder = shuffleIndices(lyricsLength);
-      setLyricsOrder(shuffledOrder);
-
-      /* Load a random lyric */
-      const firstLyricIndex = shuffledOrder[0];
-      const firstLyric = FrankLyrics[firstLyricIndex];
-      setActiveLyric(firstLyric);
-
-      /* get all unique artists */
-      const uniqueArtistsArray = getUniqueValues(FrankLyrics, 'artistName');
-      setUniqueArtists(uniqueArtistsArray);
     }
   }, []);
 
-  /* App helper functions */
-  // get next lyric in the shuffle order
-  const setNextActiveLyric = () => {
-    // get index of activeLyric's index in allLyrics
-    // FIXME: rename variables to be more descriptive
-    const indexActive = allLyrics.findIndex((lyric) => lyric === activeLyric);
-    const indexInOrder = lyricsOrder.indexOf(indexActive);
-
-    /* what to do when out of next lyrics? */
-    /* for now, immediately start loop over */
-    if (indexInOrder + 1 < allLyrics.length ) {
-      const indexNext = lyricsOrder[indexInOrder + 1];
-      setActiveLyric(allLyrics[indexNext]);
-    } else {
-      console.log('repeat');
-
-      /* shuffle */
-      const newOrder = shuffleIndices(allLyrics.length);
-      setLyricsOrder(newOrder);
-
-      /* make the next lyric the first lyric of the new order */
-      setActiveLyric(allLyrics[newOrder[0]]);
-
-      /* reset score: unable to from here, have to do in <GuessingGame /> */
-    }
-  };
-
-  // Show the prompt to play the game or the game itself
-  const displayGame = () => {
-    if (!isPlaying) {
-      return (
-        <button
-          type="button"
-          className="playButton"
-          onClick={() => setIsPlaying(true)}
-        >
-          Play
-        </button>
-      );
-    }
-
-    return (
-      <GuessingGame
-        activeLyric={activeLyric}
-        artistsList={uniqueArtists}
-        setNextLyric={setNextActiveLyric}
-      />
-    );
-  };
-
   return (
     <div className="App">
-      <LoadingScreen showComponent={isLoading} />
-      {displayGame(isPlaying)}
+      {/* shouldn't use this Nav once routing is set up */}
+      <div className="Nav">
+        <button type="button" onClick={() => setPage(HOME)}>Home</button>
+        <button type="button" onClick={() => setPage(GAME)}>Play</button>
+        <button type="button" onClick={() => setPage(SCORE)}>Score</button>
+      </div>
+      {(() => {
+        switch(page) {
+          case LOADING:
+            return (
+              <Loading
+                setPage={setPage}
+              />
+            );
+          case HOME:
+            return (
+              <Home
+                setPage={setPage}
+              />
+            );
+          case GAME:
+            return (
+              <Game
+                setPage={setPage}
+                score={score}
+                setScore={setScore}
+                allLyrics={allLyrics}
+              />
+            );
+          case SCORE:
+            return (
+              <Score
+                score={score}
+                setPage={setPage}
+              />
+            );
+          default: 
+            return null;
+        }
+      })()}
     </div>
   );
 };
