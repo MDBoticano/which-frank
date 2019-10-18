@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 /* data imported, since no backend */
-// import FrankLyrics from './data/FrankLyrics';
-import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
+import FrankLyrics from './data/FrankLyrics';
+// import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
 /* Helper functions */
 // import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
@@ -43,9 +43,8 @@ const Home = (props) => {
 const Game = (props) => {
   /* ----- State: Game ----- */
   const [activeLyric, setActiveLyric] = useState({});
-  // const [lyricsOrder, setLyricsOrder] = useState([]); // prop from App?
   const [numGuesses, setNumGuesses] = useState(props.score.length);
-  const [scorePrompt, setScorePrompt] = useState(false); 
+  const [scorePrompt, setScorePrompt] = useState(false);
 
   /* --- End State: Game --- */
 
@@ -69,10 +68,8 @@ const Game = (props) => {
 
   const checkGuess = (guess) => {
     if (guess === activeLyric.artistName) {
-      console.log('correct');
       addScore(1);
     } else {
-      console.log('incorrect');
       addScore(0);
     }
     const nextIndex = numGuesses + 1;
@@ -127,6 +124,11 @@ const reduceScore = (scoreArray) => {
   return `You score ${numCorrect} out of ${maxCorrect}`;
 };
 
+const resetGame = () => {
+  props.setPage(GAME);
+  props.setScore([]);
+}
+
 /* --- End Helpers: Score --- */
 
   return (
@@ -138,7 +140,7 @@ const reduceScore = (scoreArray) => {
       <button type="button" onClick={() => props.setPage(HOME)}>
         Home
       </button>
-      <button type="button" onClick={() => props.setPage(GAME)}>
+      <button type="button" onClick={() => resetGame()}>
         Play Again
       </button>
     </div>
@@ -168,7 +170,6 @@ const App = () => {
       // get list of all artists
       const uniqueArtists = getUniqueValues(FrankLyrics, "artistName");
       setAllArtists(uniqueArtists);
-
     }
   }, []);
 
@@ -207,8 +208,9 @@ const App = () => {
           case SCORE:
             return (
               <Score
-                score={score}
                 setPage={setPage}
+                score={score}
+                setScore={setScore}
               />
             );
           default: 
