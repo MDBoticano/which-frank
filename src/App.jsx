@@ -6,7 +6,6 @@ import FrankLyrics from './data/FrankLyrics';
 // import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
 /* Helper functions */
-// import { getUniqueValues, shuffleIndices } from './utilities/helperFuncs';
 import {
   getUniqueValues, shuffleIndices, reorderArray, sumReducer,
 } from './utilities/helperFuncs';
@@ -15,12 +14,6 @@ import {
 /* Eventually, these components will become their own set of components */
 
 /* -------------------- Pages -------------------- */
-// CONSTs
-const LOADING = 'loading';
-const HOME = 'home';
-const GAME = 'game';
-const SCORE = 'score';
-
 // Loading
 const Loading = () => (
   <div className="Loading">
@@ -31,8 +24,7 @@ const Loading = () => (
 /* ---------- Page: Home ---------- */
 const Home = (props) => (
   <div className="Home">
-    <p>Home</p>
-    <button type="button" onClick={() => props.setPage(GAME)}>
+    <button type="button" onClick={() => props.setPage('game')}>
       {'Let\'s Play!'}
     </button>
   </div>
@@ -48,7 +40,6 @@ const Game = (props) => {
   /* ----- State: Game ----- */
   const [activeLyric, setActiveLyric] = useState({});
   const [numGuesses, setNumGuesses] = useState(props.score.length);
-  const [showScorePrompt, setShowScorePrompt] = useState(false);
   /* --- End State: Game --- */
 
   /* ----- Helpers: Game ----- */
@@ -64,7 +55,7 @@ const Game = (props) => {
     }
     const nextIndex = numGuesses + 1;
     if (nextIndex === props.allLyrics.length) {
-      setShowScorePrompt(true);
+      props.setPage('score');
     } else {
       setNumGuesses(nextIndex);
       setActiveLyric(props.allLyrics[nextIndex]);
@@ -79,11 +70,6 @@ const Game = (props) => {
     ));
     return artistsButtons;
   };
-
-  const viewScorePage = () => {
-    props.setPage(SCORE);
-    setShowScorePrompt(false);
-  };
   /* --- End Helpers: Game --- */
 
   /* ----- Hooks: Game ----- */
@@ -94,23 +80,11 @@ const Game = (props) => {
   }, [props.allLyrics]);
   /* --- End Hooks: Game --- */
 
-  if (showScorePrompt) {
-    return (
-      <div className="Game">
-        <p>All Done!</p>
-        <button type="button" onClick={() => viewScorePage()}>
-          View Score
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="Game">
-      <p>Game</p>
       <div className="ActiveLyric">
-        Lyric:
-        {activeLyric.songLyric}
+        <p>{`Lyric ${numGuesses + 1} of ${props.allLyrics.length}`}</p>
+        <p>{activeLyric.songLyric}</p>
       </div>
       {makeGuessButtons(props.allArtists)}
     </div>
@@ -139,7 +113,7 @@ const Score = (props) => {
     /* Note: import sumReducer in component */
     const numCorrect = sumReducer(scoreArray);
     const maxCorrect = scoreArray.length;
-    return `You score ${numCorrect} out of ${maxCorrect}`;
+    return `You scored ${numCorrect} out of ${maxCorrect}`;
   };
 
   const resetGameAndView = (page) => {
@@ -151,14 +125,11 @@ const Score = (props) => {
 
   return (
     <div className="Score">
-      <p>
-        Score:
-        {reduceScore(props.score)}
-      </p>
-      <button type="button" onClick={() => resetGameAndView(HOME)}>
+      <p>{reduceScore(props.score)}</p>
+      <button type="button" onClick={() => resetGameAndView('home')}>
         Home
       </button>
-      <button type="button" onClick={() => resetGameAndView(GAME)}>
+      <button type="button" onClick={() => resetGameAndView('game')}>
         Play Again
       </button>
     </div>
@@ -177,7 +148,7 @@ Score.propTypes = {
 
 const App = () => {
   /* state */
-  const [page, setPage] = useState(LOADING);
+  const [page, setPage] = useState('loading');
   const [allLyrics, setAllLyrics] = useState([]);
   const [shuffledLyrics, setShuffledLyrics] = useState([]);
   const [allArtists, setAllArtists] = useState([]);
@@ -194,8 +165,7 @@ const App = () => {
   useEffect(() => {
     const lyricsLength = FrankLyrics.length;
     if (lyricsLength > 0) {
-      setPage(HOME);
-
+      setPage('home');
       setAllLyrics(FrankLyrics);
 
       // shuffle and set the retrieved lyrics
@@ -212,32 +182,32 @@ const App = () => {
 
   return (
     <div className="App">
+      <p>{page}</p>
       {(() => {
         switch (page) {
-          case LOADING:
+          case 'loading':
             return (
               <Loading
                 setPage={setPage}
               />
             );
-          case HOME:
+          case 'home':
             return (
               <Home
                 setPage={setPage}
               />
             );
-          case GAME:
+          case 'game':
             return (
               <Game
                 setPage={setPage}
                 score={score}
                 setScore={setScore}
-                // allLyrics={allLyrics}
                 allLyrics={shuffledLyrics}
                 allArtists={allArtists}
               />
             );
-          case SCORE:
+          case 'score':
             return (
               <Score
                 setPage={setPage}
