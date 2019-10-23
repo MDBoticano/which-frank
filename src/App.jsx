@@ -5,6 +5,10 @@ import PropTypes from 'prop-types';
 import FrankLyrics from './data/FrankLyrics';
 // import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
+
+/* for lyrics API testing */
+import LyricsAPI from './lyrics-api/LyricsAPI';
+
 /* Helper functions */
 import {
   getUniqueValues, shuffleIndices, reorderArray, sumReducer,
@@ -148,7 +152,8 @@ Score.propTypes = {
 
 const App = () => {
   /* state */
-  const [page, setPage] = useState('loading');
+  // const [page, setPage] = useState('loading');
+  const [page, setPage] = useState('lyricsAPI');
   const [allLyrics, setAllLyrics] = useState([]);
   const [shuffledLyrics, setShuffledLyrics] = useState([]);
   const [allArtists, setAllArtists] = useState([]);
@@ -165,7 +170,7 @@ const App = () => {
   useEffect(() => {
     const lyricsLength = FrankLyrics.length;
     if (lyricsLength > 0) {
-      setPage('home');
+      // setPage('home');
       setAllLyrics(FrankLyrics);
 
       // shuffle and set the retrieved lyrics
@@ -214,6 +219,12 @@ const App = () => {
                 score={score}
                 setScore={setScore}
                 reshuffleLyrics={reshuffleLyrics}
+              />
+            );
+          case 'lyricsAPI':
+            return (
+              <LyricsAPI
+                setPage={setPage}
               />
             );
           default:
