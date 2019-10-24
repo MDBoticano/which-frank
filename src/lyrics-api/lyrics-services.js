@@ -5,57 +5,32 @@ import axios from 'axios';
 const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 const API = "https://api.musixmatch.com/ws/1.1/";
 
-/* search for a specific number of artists */
-/* return format */
-export const artistSearch = async (artist, num = 1, api_key) => {
-  try {
-    const QUERY = `artist.search?q_artist=${artist}&page_size=${num}`;
-    const API_KEY = `&apikey=${api_key}`;
-    const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
+/**
+ * @param {name} string - name of artists to look for
+ * @param {setter} func - state modifier function to call
+ * @param {numResults} number - number of artists to retreive
+ * @return [ { artistNmame: string, artistId: number }, ... ]
+ */
+export const getArtistList = async (name, numResults, setter, api_key) => {
+  const QUERY = `artist.search?q_artist=${name}&page_size=${numResults}`;
+  const API_KEY = `&apikey=${api_key}`;
 
-    const result = await axios(requestURL);
+  const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
 
-    const artistList = result.data.message.body.artist_list;
-    console.log('artist list retrieved', artistList);
-
-    const artistsData = artistList.map(artist => {
-      console.log('mapping artists');
-      return ({ 
-        artistName: artist.artist.artist_name,
-        artistId: artist.artist.artist_id,
-      });
-    });
-
-    // console.log(artistsData);
-    return artistsData;
-  } catch (e) {
-    console.log('artistSearch error:', e);
-  }
-  return null;
+  const result = await axios(requestURL);
+  
+  const artistList = result.data.message.body.artist_list;
+  // console.log(artistList);
+  const simpleArtistList = artistList.map(artist => (
+    { 
+      artistName: artist.artist.artist_name,
+      artistId: artist.artist.artist_id,
+    }
+  ))
+  console.log(simpleArtistList);
+  setter(simpleArtistList);
 }
 
-
-/* search that list for our key targets: Frank Ocean & Frank Sinatra */
-
-/* get artist id */
-export const getArtistIdOf = (name) => {
-
-
-  return "id";
-}
-
-/* get discography (albums or popular tracks if possible) */
-
-/* get top x artists */
-// const getTopTracksFrom = (artists, numTracks) => {
-
-//   return [];
-//   /* return an array of track ids, and maybe track names */
-
-// }
-
-
-/* get snippet from track id */
-
-
-/* export */
+/**
+ * 
+ */

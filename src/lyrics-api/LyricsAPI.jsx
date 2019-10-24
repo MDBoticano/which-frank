@@ -1,57 +1,69 @@
 import React, { useState, useEffect } from 'react';
-// import { 
-  // getArtistIdOf,
-  // artistSearch,
-// } from './lyrics-services';
-
-import axios from 'axios';
+import { 
+  getArtistList,
+} from './lyrics-services';
 
 const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
-console.log(process.env.NODE_ENV);
-console.log(API_KEY);
+// console.log(process.env.NODE_ENV);
+// console.log(API_KEY);
 
 
 
 const LyricsAPI = (props) => {
-  const [artistsData, setArtistsData] = useState({ artist_list: [ ] });
-  // const [loading ,setLoading] = useState(false);
-
-  // const getArtist = (artist, num = 3) => {
-  //   const result = artistSearch(artist, num, API_KEY);
-  //   return result;
-  // }
-
-  const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
-  const API = "https://api.musixmatch.com/ws/1.1/";
-  // const QUERY = `artist.search?q_artist=${artist}&page_size=${num}`;
-  const QUERY = `artist.search?q_artist=frank&page_size=3`;
-  const API_KEY_PARAM = `&apikey=${API_KEY}`;
-
-  const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY_PARAM}`;
+  const [artistsData, setArtistsData] = useState([]);
+  // const [artistSongs, setArtistSongs] = useState([]);
+  const [loading ,setLoading] = useState(true);
 
   useEffect(() => {
     const fetchArtists = async () => {
-      const result = await axios(requestURL);
-      // setArtistsData(result.data);
-      setArtistsData(result.data.message.body)
+      getArtistList('frank ocean', 1, setArtistsData, API_KEY);
     }
+
+    // const fetchTopSongs = async (artists, numSongs) => {
+    //   const artist = artists[0].artist.artist_name
+
+
+    //   /* extract artist names from list */
+    //   const QUERY = `track.search?q_artist=${artist}&page_size=${numSongs}&s_track_rating=desc`;
+    //   const API_KEY_PARAM = `&apikey=${API_KEY}`;
+
+    //   /* get one artist's songs */ 
+
+    //   /* turn function into a loop */
+    
+    //   const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY_PARAM}`;
+
+    //   const result = await axios(requestURL);
+
+    //   setArtistSongs(result);
+    // }
+
     if (window.confirm('Query?')) {
       fetchArtists();
-    }    
-  }, [requestURL]);
+      // fetchTopSongs([{
+      //   artist: {
+      //     artist_name: "Frank Ocean",
+      //   }
+      // }], 5);
+    }
 
- 
+    setLoading(false);
+  }, []);
+
+  const displayLoading = (isLoading) => {
+    if (isLoading) { return <p>loading...</p> }
+  }  
 
   return (
     <div className="LyricsAPI">
       <p>Lyrics. Yeah!</p>
       <p>Query Result:</p>
       {/* {displayArtists(artistsData)} */}
-      {/* {displayLoading(loading)} */}
+      {displayLoading(loading)}
       <ul>
-        {artistsData.artist_list.map(artist => (
-          <li key={artist.artist.artist_id}>
-            {artist.artist.artist_name}
+        {artistsData.map(artist => (
+          <li key={artist.artistId}>
+            {artist.artistName} -- {artist.artistId}
           </li>
         ))}
       </ul>
