@@ -25,7 +25,7 @@ export const getArtistList = async (artist, numResults, setter, api_key) => {
       artist_id: artist.artist.artist_id,
     }
   ))
-  console.log(simpleArtistList);
+  console.log('artist list:', simpleArtistList);
   setter(simpleArtistList);
 }
 
@@ -42,7 +42,7 @@ export const getTopTracks = async (artist, numResults, setter, api_key) => {
 
   const requestURL = `${CORS_PROXY}${API}${QUERY}${MODIFIERS}${API_KEY}`;
   const result = await axios(requestURL);
-  console.log(result);
+  // console.log(result);
 
   const trackList = result.data.message.body.track_list;
   const simplerTrackList = trackList.map(track => (
@@ -54,6 +54,39 @@ export const getTopTracks = async (artist, numResults, setter, api_key) => {
     }
   ))
 
-  console.log(simplerTrackList);
+  console.log('tracklist:', simplerTrackList);
   setter(simplerTrackList);
+}
+
+/**
+ * 
+ */
+export const getLyricSnippet = async (trackId, callback, api_key) => {
+  const QUERY = `track.snippet.get?track_id=${trackId}`;
+  const API_KEY = `&apikey=${api_key}`;
+
+  const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
+  const result = await axios(requestURL);
+  console.log(result);
+
+  const snippet = result.data.message.body.snippet;
+  const simplerSnippet = snippet.snippet_body;
+  console.log('snippet', simplerSnippet);
+  // return simplerSnippet;
+  await callback(simplerSnippet);
+  console.log('snippet added');
+}
+
+/**
+ * 
+ */
+export const getMultipleSnippets = async (tracks, callback, api_key) => {
+  const trackIdsArray = tracks.map(track => track.track_id);
+  trackIdsArray.forEach((trackId) => {
+    console.log('getting snippet for', trackId);
+    if (trackId === undefined) {
+      return
+    }
+    getLyricSnippet(trackId, callback, api_key);
+  })
 }

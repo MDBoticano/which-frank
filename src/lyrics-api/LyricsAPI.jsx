@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   getArtistList,
   getTopTracks,
+  // getLyricSnippet,
+  getMultipleSnippets,
 } from './lyrics-services';
 
 const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
@@ -11,7 +13,16 @@ const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
 const LyricsAPI = (props) => {
   const [artistsData, setArtistsData] = useState([]);
   const [artistSongs, setArtistSongs] = useState([]);
+  const [lyricSnippets, setLyricSnippets] = useState([]);
   const [loading ,setLoading] = useState(true);
+
+  const addSnippet = (snippet) => {
+    console.log('adding snippet');
+    // setLyricSnippets([...lyricSnippets, snippet]);
+    const newSnippets = lyricSnippets;
+    newSnippets.push(snippet)
+    setLyricSnippets(newSnippets);
+  }
 
   useEffect(() => {
     const fetchArtists = () => {
@@ -19,20 +30,37 @@ const LyricsAPI = (props) => {
     }
 
     const fetchTopTracks = () => {
-      getTopTracks('frank ocean', 5, setArtistSongs, API_KEY);
+      getTopTracks('frank ocean', 2, setArtistSongs, API_KEY);
     }
+
+    // const fetchLyric = (trackId) => {
+    //   getLyricSnippet( trackId, addSnippet, API_KEY);
+    // }    
 
     if (window.confirm('Query?')) {
       fetchArtists();
       fetchTopTracks();
+      // fetchLyric('186133518');
     }
 
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    const fetchMultipleSnippets = (tracks) => {
+      console.log('tracks', tracks);
+      // getMultipleSnippets(tracks, setLyricSnippets, API_KEY);
+      getMultipleSnippets(tracks, addSnippet, API_KEY);
+    }
+    if (artistsData.length > 0) {
+      console.log('artist exists');
+      fetchMultipleSnippets(artistSongs);
+    }
+  }, [artistSongs, addSnippet, artistsData]);
+
   const displayLoading = (isLoading) => {
     if (isLoading) { return <p>loading...</p> }
-  }  
+  }
 
   return (
     <div className="LyricsAPI">
@@ -45,13 +73,17 @@ const LyricsAPI = (props) => {
             {artist.artist_name} -- {artist.artist_id}
           </li>
         ))}
-      </ul>
-      <ul>
+        <ul>
         {artistSongs.map(song => (
           <li key={song.track_id}>
-            {song.track_name} -- {song.album_name}
+            <p>{song.track_name} -- {song.album_name}</p>
           </li>
         ))}
+      </ul>
+      </ul>
+      <ul>
+        Lyric Snippets
+        {lyricSnippets.map(snip => (<li key={snip}> <p>{snip}</p> </li>))}
       </ul>
       <button type="button" onClick={() => props.setPage('home')}>
         Home
