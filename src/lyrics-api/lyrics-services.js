@@ -2,23 +2,24 @@
 import axios from 'axios';
 
 /* consts */
-const PROXY_URL = "https://cors-anywhere.herokuapp.com/";
-const API_URL = `https://api.musixmatch.com/ws/1.1/`;
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+const API = "https://api.musixmatch.com/ws/1.1/";
 
 /* search for a specific number of artists */
 /* return format */
 export const artistSearch = async (artist, num = 1, api_key) => {
   try {
-    const QUERIES = `artist.search?q_artist=${artist}&page_size=${num}`;
+    const QUERY = `artist.search?q_artist=${artist}&page_size=${num}`;
     const API_KEY = `&apikey=${api_key}`;
-    const completeURL = PROXY_URL + API_URL + QUERIES + API_KEY;
+    const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
 
-    const result = await axios.get(completeURL);
+    const result = await axios(requestURL);
 
     const artistList = result.data.message.body.artist_list;
-    // console.log('artist list', artistList);
+    console.log('artist list retrieved', artistList);
 
     const artistsData = artistList.map(artist => {
+      console.log('mapping artists');
       return ({ 
         artistName: artist.artist.artist_name,
         artistId: artist.artist.artist_id,
