@@ -12,6 +12,7 @@ const API = "https://api.musixmatch.com/ws/1.1/";
 const Snippets = () => {
   const [artistsList, setArtistsList] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
+  const [trackSnippets, setTrackSnippets] = useState([]);
 
   const getArtists = async (name, number) => {
     const QUERY = `artist.search?q_artist=${name}&page_size=${number}`;
@@ -30,6 +31,7 @@ const Snippets = () => {
     return artistsNameAndId;
   }
 
+  /* get one artist's top tracks */
   const getArtistTopTracks = async (artist, number) => {
     const QUERY = `track.search?q_artist=${artist}`;
     const MODIFIERS = `&page_size=${number}&s_track_rating=desc`;
@@ -50,6 +52,7 @@ const Snippets = () => {
     return trackDetails;
   }
 
+  /* get multiple artist's top tracks */
   const getAllTopTracks = async (artistsList, number) => {
     let allTracks = [];
     for (let i = 0; i < artistsList.length; i++) {
@@ -65,47 +68,64 @@ const Snippets = () => {
     return allTracks;
   }
 
+  /* get the snippet for one song */
+  const getTrackSnippet = async (trackId) => {
+    const QUERY = `track.snippet.get?track_id=${trackId}`;
+    const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
+    const result = await axios.get(requestURL);
+    console.log('get one trackSnippet -- axios.get result:', result);
+
+    const lyricString = result.data.message.body.snippet.snippet_body;
+    return lyricString;
+  }
+
+  /* get the snippet for multiple songs */
+  const getAllTrackSnippets = async (tracks) => {
+    let allSnippets = [];
+    for (let i = 0; i < tracks.length; i++ ) {
+      const trackArray = tracks[i];
+      for (let j = 0; j < trackArray.length; j++) {
+        const trackId = trackArray[j].track_id;
+        console.log('track id', trackId);
+        const snippet = await getTrackSnippet(trackId);
+        console.log(snippet);
+        allSnippets = [...allSnippets, snippet];
+      }
+    }
+    return allSnippets;
+  }
+
 
   useEffect(() => {
     const startQueries = async () => {
       if (window.confirm('Query?')) {
         /* Step 1: Get artist(s) */
-        const artists = await getArtists('frank', 2);
+        const artists = await getArtists('frank ocean', 1);
         console.log('artists result:', artists) // Promise -- nope, not anymore
 
         /* Step 2: get top tracks per artist */
-
-        // Invididual retrieval -- async okay
-        // const topTracks = await getArtistTopTracks('frank sinatra', 2);
-        // console.log(topTracks);
-
-        // Multiple retrieval -- not properly async
         const allTopTracks = await getAllTopTracks(artists, 2);
         console.log('allTopTracks result:', allTopTracks);
 
-        // Multiple retrieval but hardcoded - works
-        // const allTopTracks = [];
-        // for (let i = 0; i < artists.length; i++) {
-        //   const artistName = artists[i].artist_name;
-        //   const topTracks = await getArtistTopTracks(artistName, 2);
-        //   console.log(artistName, topTracks);
+        /* Step 3: get snippets for each track */
+        // individual track
+        // const oneTrackSnippet = await getTrackSnippet('186133518');
+        // console.log('oneTrackSnippet result:', oneTrackSnippet);
 
-        //   allTopTracks.push(topTracks);
-        // }
-        // console.log('top tracks post loop:', allTopTracks);
+        const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
+        console.log('topTrackSnippets result:', topTrackSnippets);
 
         
         
         /* set state */
         setArtistsList(artists);
         setTopTracks(allTopTracks);
-
+        setTrackSnippets(topTrackSnippets);
       }
     }
 
     startQueries();
-    // eslint-disable-next-line
-
+  // eslint-disable-next-line
   }, [])
 
   const displayTopTracks = (tracksObj) => (
@@ -116,6 +136,10 @@ const Snippets = () => {
       })
     })
   )
+
+  const displayTrackSnippets = (snippets) => {
+    return snippets.map((snip,index) => <li key={index}>{snip}</li>)
+  }
 
   return (
     <div className="Snippets">
@@ -130,6 +154,10 @@ const Snippets = () => {
       <h2>Top Tracks</h2>
       <ul>
         {topTracks && displayTopTracks(topTracks)}
+      </ul>
+      <h2>Track Snippets</h2>
+      <ul>
+        {trackSnippets && displayTrackSnippets(trackSnippets)}
       </ul>
     </div>
   )
