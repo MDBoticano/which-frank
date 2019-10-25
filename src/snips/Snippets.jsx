@@ -50,20 +50,6 @@ const Snippets = () => {
     return trackDetails;
   }
 
-  // const getAllTopTracks = (artistsList, number) => {
-  //   const artistsTracks = [];
-  //   artistsList.forEach(async (artist) => {
-  //     const artistName = artist.artist_name;
-  //     const artistTracks = await getArtistTopTracks(artistName, number);
-  //     const trackObj = {
-  //       artist_name: artistName,
-  //       artistTracks: artistTracks,
-  //     }
-  //     await artistsTracks.push(trackObj);
-  //   });
-  //   return artistsTracks;
-  // }
-
   const getAllTopTracks = async (artistsList, number) => {
     let allTracks = [];
     for (let i = 0; i < artistsList.length; i++) {
@@ -94,9 +80,10 @@ const Snippets = () => {
         // console.log(topTracks);
 
         // Multiple retrieval -- not properly async
-        const allTopTracks = getAllTopTracks(artists, 2);
-        console.log('top tracks result:', allTopTracks);
+        const allTopTracks = await getAllTopTracks(artists, 2);
+        console.log('allTopTracks result:', allTopTracks);
 
+        // Multiple retrieval but hardcoded - works
         // const allTopTracks = [];
         // for (let i = 0; i < artists.length; i++) {
         //   const artistName = artists[i].artist_name;
@@ -118,39 +105,31 @@ const Snippets = () => {
 
     startQueries();
     // eslint-disable-next-line
+
   }, [])
 
-  const displayTopTracks = (tracksObj) => {
-    if (tracksObj && tracksObj.length > 0) {
-      return tracksObj.map(obj => {
-        if (obj.artistTracks && obj.artistTracks.length > 0) {
-          return (obj.artistTracks.map(t => <p>{t}</p>))
-        }
-        return <p>???</p>
+  const displayTopTracks = (tracksObj) => (
+    tracksObj && tracksObj.map(topTracksSet => {
+      return topTracksSet.map(track => {
+        // console.log(track, track.track_name);
+        return <p key={track.track_id}>{track.track_name}</p>
       })
-    }
-  }
+    })
+  )
 
   return (
     <div className="Snippets">
+      {console.log('<Snippets /> render')}
       <h1>Snippets</h1>
       <h2>Artists</h2>
       <ul>
-        { artistsList && artistsList.map( a => 
+        {artistsList && artistsList.map( a => 
           <li key={a.artist_id}>{a.artist_name}</li>
         )}
       </ul>
       <h2>Top Tracks</h2>
       <ul>
-        {/* { topTracks && topTracks.map(artist => {
-          return (
-            artist.artistTracks.map(t => {
-            return <p>{t}</p>
-            })
-          })
-          ) */
-          displayTopTracks(topTracks)
-        }
+        {topTracks && displayTopTracks(topTracks)}
       </ul>
     </div>
   )
