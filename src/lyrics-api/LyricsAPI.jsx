@@ -16,7 +16,7 @@ const LyricsAPI = (props) => {
 
   const [artistsData, setArtistsData] = useState([]);
   const [artistSongs, setArtistSongs] = useState([]);
-  const [lyricSnippets, setLyricSnippets] = useState(null);
+  const [lyricSnippets, setLyricSnippets] = useState([]);
   const [loading ,setLoading] = useState(true);
   const [lyricsLoading, setLyricsLoading] = useState(true);
 
@@ -26,7 +26,7 @@ const LyricsAPI = (props) => {
     }
 
     const fetchTopTracks = () => {
-      getTopTracks('frank ocean', 10, setArtistSongs, API_KEY);
+      getTopTracks('frank ocean', 1, setArtistSongs, API_KEY);
     }
 
     // const fetchLyric = (trackId) => {
@@ -52,20 +52,24 @@ const LyricsAPI = (props) => {
     // }
 
     const fetchMultipleSnippets = (tracks) => {
-      console.log('tracks', tracks);
+      console.log('tracks to get snippets for', tracks);
       // getMultipleSnippets(tracks, addSnippet, API_KEY);
-      setLoading(true);
       setMultipleSnippets(tracks, setLyricSnippets, API_KEY);
-      setLoading(false);
     }
 
-    if (artistsData.length > 0) {
+    // Don't get snippets until there's tracks to get snippets for
+    if (artistSongs.length > 0) {
       console.log('artist exists');
       setLyricsLoading(true);
       fetchMultipleSnippets(artistSongs);
       setLyricsLoading(false);
     }
-  }, [artistSongs, artistsData]);
+  }, [artistSongs]);
+
+  useEffect(() => {
+    setLyricsLoading(true);
+    setLyricsLoading(false);
+  }, [lyricSnippets])
 
   const displayLoading = (isLoading) => {
     if (isLoading) { return <p>loading...</p> }
@@ -75,9 +79,16 @@ const LyricsAPI = (props) => {
     if (isLoading) { return <p>lyric snippets are loading..</p>}
   }
 
+  const displaySnippets = () => {
+    lyricSnippets.map((snip, snipInd) => {
+      console.log('displaying snippets in list', snip)
+      return (<li key={snipInd}> <p>{snip}</p> </li>)
+    })
+  }
+
   return (
     <div className="LyricsAPI">
-      {/* {console.log('<LyricsAPI/> rerender')} */}
+      {console.log('<LyricsAPI/> rerender')}
       <p>Lyrics. Yeah!</p>
       <p>Query Result:</p>
       {displayLoading(loading)}
@@ -97,11 +108,8 @@ const LyricsAPI = (props) => {
       </ul>
       <ul>
         Lyric Snippets
-        { lyricSnippets && lyricSnippets.map(snip => {
-          if (snip === Promise) { return <p>wait...</p>}
-          console.log('snippet to list', snip)
-          return (<li key={snip}> <p>{snip}</p> </li>)
-          })
+        { 
+          displaySnippets()
         }
         {lyricsAreLoading(lyricsLoading)}
       </ul>

@@ -118,15 +118,15 @@ export const setMultipleSnippets = async (tracks, callback, api_key) => {
   let snippetsToAdd = [];
 
   const trackIdsArray = tracks.map(track => track.track_id);
-  trackIdsArray.forEach(async (trackId) => {
+  trackIdsArray.forEach((trackId) => {
     console.log('getting snippet for', trackId);
     if (trackId === undefined) {
       return
     }
-    const snippet = await returnLyricSnippet(trackId, api_key)
+    const snippet = returnLyricSnippet(trackId, api_key)
     snippetsToAdd.push(snippet)
     // snippetsToAdd = [...snippetsToAdd, snippet];
   })
-  await callback(snippetsToAdd);
-  console.log('snippetsToAdd:', snippetsToAdd, snippetsToAdd.length);
+  callback(snippetsToAdd);
+  // console.log('snippetsToAdd:', snippetsToAdd, snippetsToAdd.length);
 }
