@@ -9,46 +9,127 @@ const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 const API = "https://api.musixmatch.com/ws/1.1/";
 
 
-
-
 const Snippets = () => {
   const [artistsList, setArtistsList] = useState([]);
+  const [topTracks, setTopTracks] = useState([]);
 
   const getArtists = async (name, number) => {
     const QUERY = `artist.search?q_artist=${name}&page_size=${number}`;
     const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
+    
     const result = await axios.get(requestURL);
-    console.log('axios.get result:', result);
+    console.log('getArtists -- axios.get result:', result);
 
-    const artistList = result.data.message.body.artist_list;
-    const simpleArtistList = artistList.map(artist => (
-    { 
+    const artist_list = result.data.message.body.artist_list;
+    const artistsNameAndId = artist_list.map(artist => ({ 
       artist_name: artist.artist.artist_name,
       artist_id: artist.artist.artist_id,
     }))
 
-    console.log('getting artist list:', simpleArtistList);
-    // setArtistsList(simpleArtistList)
-    return simpleArtistList;
+    console.log('getting artist list:', artistsNameAndId);
+    return artistsNameAndId;
+  }
+
+  const getArtistTopTracks = async (artist, number) => {
+    const QUERY = `track.search?q_artist=${artist}`;
+    const MODIFIERS = `&page_size=${number}&s_track_rating=desc`;
+    const requestURL = `${CORS_PROXY}${API}${QUERY}${MODIFIERS}${API_KEY}`;
+    
+    const result = await axios.get(requestURL);
+    console.log('getTopTracks -- axios.get result:', result);
+
+    const track_list = result.data.message.body.track_list;
+    const trackDetails = track_list.map(track => ({
+      track_name: track.track.track_name,
+      track_id: track.track.track_id,
+      album_name: track.track.album_name,
+      album_id: track.track.album_id,
+    }))
+
+    console.log('getting top tracks:', trackDetails);
+    return trackDetails;
+  }
+
+  // const getAllTopTracks = (artistsList, number) => {
+  //   const artistsTracks = [];
+  //   artistsList.forEach(async (artist) => {
+  //     const artistName = artist.artist_name;
+  //     const artistTracks = await getArtistTopTracks(artistName, number);
+  //     const trackObj = {
+  //       artist_name: artistName,
+  //       artistTracks: artistTracks,
+  //     }
+  //     await artistsTracks.push(trackObj);
+  //   });
+  //   return artistsTracks;
+  // }
+
+  const getAllTopTracks = async (artistsList, number) => {
+    let allTracks = [];
+    for (let i = 0; i < artistsList.length; i++) {
+      const artistName = artistsList[i].artist_name;
+      const topTracks = await getArtistTopTracks(artistName, number);
+      console.log(artistName, topTracks);
+
+      // allTracks.push(topTracks);
+      allTracks = [...allTracks, topTracks];
+      console.log('adding to allTracks');
+    }
+    console.log('done looping');
+    return allTracks;
   }
 
 
   useEffect(() => {
-
     const startQueries = async () => {
       if (window.confirm('Query?')) {
-        const artists = await getArtists('frank', 2)
-        console.log(artists) // Promise
+        /* Step 1: Get artist(s) */
+        const artists = await getArtists('frank', 2);
+        console.log('artists result:', artists) // Promise -- nope, not anymore
+
+        /* Step 2: get top tracks per artist */
+
+        // Invididual retrieval -- async okay
+        // const topTracks = await getArtistTopTracks('frank sinatra', 2);
+        // console.log(topTracks);
+
+        // Multiple retrieval -- not properly async
+        const allTopTracks = getAllTopTracks(artists, 2);
+        console.log('top tracks result:', allTopTracks);
+
+        // const allTopTracks = [];
+        // for (let i = 0; i < artists.length; i++) {
+        //   const artistName = artists[i].artist_name;
+        //   const topTracks = await getArtistTopTracks(artistName, 2);
+        //   console.log(artistName, topTracks);
+
+        //   allTopTracks.push(topTracks);
+        // }
+        // console.log('top tracks post loop:', allTopTracks);
 
         
+        
+        /* set state */
+        setArtistsList(artists);
+        setTopTracks(allTopTracks);
 
       }
     }
 
     startQueries();
-   
-
+    // eslint-disable-next-line
   }, [])
+
+  const displayTopTracks = (tracksObj) => {
+    if (tracksObj && tracksObj.length > 0) {
+      return tracksObj.map(obj => {
+        if (obj.artistTracks && obj.artistTracks.length > 0) {
+          return (obj.artistTracks.map(t => <p>{t}</p>))
+        }
+        return <p>???</p>
+      })
+    }
+  }
 
   return (
     <div className="Snippets">
@@ -58,6 +139,18 @@ const Snippets = () => {
         { artistsList && artistsList.map( a => 
           <li key={a.artist_id}>{a.artist_name}</li>
         )}
+      </ul>
+      <h2>Top Tracks</h2>
+      <ul>
+        {/* { topTracks && topTracks.map(artist => {
+          return (
+            artist.artistTracks.map(t => {
+            return <p>{t}</p>
+            })
+          })
+          ) */
+          displayTopTracks(topTracks)
+        }
       </ul>
     </div>
   )
