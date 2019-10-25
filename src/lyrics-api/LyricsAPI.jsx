@@ -3,7 +3,8 @@ import {
   getArtistList,
   getTopTracks,
   // getLyricSnippet,
-  getMultipleSnippets,
+  // getMultipleSnippets,
+  setMultipleSnippets,
 } from './lyrics-services';
 
 const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
@@ -11,11 +12,11 @@ const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
 // console.log(API_KEY);
 
 const LyricsAPI = (props) => {
-  console.log('<LyricsAPI/> remount');
+  // console.log('<LyricsAPI/> remount');
 
   const [artistsData, setArtistsData] = useState([]);
   const [artistSongs, setArtistSongs] = useState([]);
-  const [lyricSnippets, setLyricSnippets] = useState([]);
+  const [lyricSnippets, setLyricSnippets] = useState(null);
   const [loading ,setLoading] = useState(true);
   const [lyricsLoading, setLyricsLoading] = useState(true);
 
@@ -25,7 +26,7 @@ const LyricsAPI = (props) => {
     }
 
     const fetchTopTracks = () => {
-      getTopTracks('frank ocean', 2, setArtistSongs, API_KEY);
+      getTopTracks('frank ocean', 10, setArtistSongs, API_KEY);
     }
 
     // const fetchLyric = (trackId) => {
@@ -42,17 +43,20 @@ const LyricsAPI = (props) => {
   }, []);
 
   useEffect(() => {
-    const addSnippet = (snippet) => {
-      console.log('adding snippet');
-      // setLyricSnippets([...lyricSnippets, snippet]);
-      const newSnippets = lyricSnippets;
-      newSnippets.push(snippet)
-      setLyricSnippets(newSnippets);
-    }
+    // const addSnippet = (snippet) => {
+    //   console.log('adding snippet');
+    //   // setLyricSnippets([...lyricSnippets, snippet]);
+    //   const newSnippets = lyricSnippets;
+    //   newSnippets.push(snippet)
+    //   setLyricSnippets(newSnippets);
+    // }
 
     const fetchMultipleSnippets = (tracks) => {
       console.log('tracks', tracks);
-      getMultipleSnippets(tracks, addSnippet, API_KEY);
+      // getMultipleSnippets(tracks, addSnippet, API_KEY);
+      setLoading(true);
+      setMultipleSnippets(tracks, setLyricSnippets, API_KEY);
+      setLoading(false);
     }
 
     if (artistsData.length > 0) {
@@ -61,7 +65,7 @@ const LyricsAPI = (props) => {
       fetchMultipleSnippets(artistSongs);
       setLyricsLoading(false);
     }
-  }, [artistSongs, lyricSnippets, artistsData]);
+  }, [artistSongs, artistsData]);
 
   const displayLoading = (isLoading) => {
     if (isLoading) { return <p>loading...</p> }
@@ -73,7 +77,7 @@ const LyricsAPI = (props) => {
 
   return (
     <div className="LyricsAPI">
-      {console.log('<LyricsAPI/> rerender')}
+      {/* {console.log('<LyricsAPI/> rerender')} */}
       <p>Lyrics. Yeah!</p>
       <p>Query Result:</p>
       {displayLoading(loading)}
@@ -93,7 +97,8 @@ const LyricsAPI = (props) => {
       </ul>
       <ul>
         Lyric Snippets
-        { lyricSnippets.map(snip => {
+        { lyricSnippets && lyricSnippets.map(snip => {
+          if (snip === Promise) { return <p>wait...</p>}
           console.log('snippet to list', snip)
           return (<li key={snip}> <p>{snip}</p> </li>)
           })
