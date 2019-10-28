@@ -10,6 +10,9 @@ const API = "https://api.musixmatch.com/ws/1.1/";
 
 
 const Snippets = () => {
+  const [nameArtist] = useState('21');
+  const [numArtists] = useState(2);
+  const [numTracks] = useState(2);
   const [artistsList, setArtistsList] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
   const [trackSnippets, setTrackSnippets] = useState([]);
@@ -24,15 +27,6 @@ const Snippets = () => {
 
     const responseBody = result.data.message.body;
     return responseBody;
-
-    // const artist_list = result.data.message.body.artist_list;
-    // const artistsNameAndId = artist_list.map(artist => ({ 
-    //   artist_name: artist.artist.artist_name,
-    //   artist_id: artist.artist.artist_id,
-    // }))
-
-    // console.log('getting artist list:', artistsNameAndId);
-    // return artistsNameAndId;
   }
 
   const parseArtistsDetails = (responseBody) => {
@@ -46,6 +40,8 @@ const Snippets = () => {
     return artistNamesAndIds;
   }
 
+
+
   /* get one artist's top tracks */
   const getArtistTopTracks = async (artist, number) => {
     const QUERY = `track.search?q_artist=${artist}`;
@@ -53,21 +49,10 @@ const Snippets = () => {
     const requestURL = `${CORS_PROXY}${API}${QUERY}${MODIFIERS}${API_KEY}`;
     
     const result = await axios.get(requestURL);
-    console.log('getTopTracks -- axios.get result:', result);
+    console.log('getTopTracks -- axios.get result:', artist, result);
 
     const responseBody = result.data.message.body;
     return responseBody;
-
-    // const track_list = result.data.message.body.track_list;
-    // const trackDetails = track_list.map(track => ({
-    //   track_name: track.track.track_name,
-    //   track_id: track.track.track_id,
-    //   album_name: track.track.album_name,
-    //   album_id: track.track.album_id,
-    // }))
-
-    // console.log('getting top tracks:', trackDetails);
-    // return trackDetails;
   }
 
   const parseArtistTopTracks = (responseBody) => {
@@ -107,8 +92,15 @@ const Snippets = () => {
     const result = await axios.get(requestURL);
     console.log('get one trackSnippet -- axios.get result:', result);
 
-    const lyricString = result.data.message.body.snippet.snippet_body;
-    return lyricString;
+    // const lyricString = result.data.message.body.snippet.snippet_body;
+    // return lyricString;
+    const responseBody = result.data.message.body;
+    return responseBody;
+  }
+
+  const parseSnippet = (responseBody) => {
+    const snippet = responseBody.snippet.snippet_body;
+    return snippet;
   }
 
   /* get the snippet for multiple songs */
@@ -119,12 +111,50 @@ const Snippets = () => {
       for (let j = 0; j < trackArray.length; j++) {
         const trackId = trackArray[j].track_id;
         console.log('track id', trackId);
-        const snippet = await getTrackSnippet(trackId);
-        console.log(snippet);
+        const snippetResponse = await getTrackSnippet(trackId);
+        const snippet = parseSnippet(snippetResponse);
+        console.log('lyric snippet', snippet);
         allSnippets = [...allSnippets, snippet];
       }
     }
     return allSnippets;
+  }
+
+  const initializeAllLyrics = (artistList, numTracks) => {
+    let lyricsArray = [];
+    for (let i = 0; i < artistList.length; i++) {
+      const artist_name = artistList[i].artist_name;
+      const artist_id = artistList[i].artist_id;
+      for (let j = 0; j < numTracks; j++) {
+        lyricsArray = lyricsArray.concat({
+          artist_name: artist_name,
+          artist_id: artist_id,
+          track_name: '',
+          track_id: '',
+          album_name: '',
+          album_id: '',
+        });
+      }
+    }
+
+    return lyricsArray;
+  }
+
+  /**
+   * FIXME: incompatible with current TopTracks implementation 
+   * This function assumes a 1d array with all topTracks in one array
+   * Currently, topTracks is one array perArtist
+   * either do fancy math to convert the dimensions, or restructure topTracks getter
+   */
+  const addTopTracksToAllLyrics = (allLyrics, topTracks) => {
+    // if (allLyrics.length !== topTracks.length) { return allLyrics }
+    for (let i = 0; i < allLyrics.length; i++) {
+      allLyrics[i].track_name = topTracks[i].track_name;
+      allLyrics[i].track_id = topTracks[i].track_id;
+      allLyrics[i].album_name = topTracks[i].album_name;
+      allLyrics[i].album_id = topTracks[i].album_id;
+    }
+    return allLyrics;
   }
 
 
@@ -151,12 +181,16 @@ const Snippets = () => {
         /* With separate parsers */
         // Step 1: Get Artist(s)
         // const artists = await getArtists('frank ocean', 1);
-        const artists = await getArtists('21', 2);
+        const artists = await getArtists(nameArtist, numArtists);
         const parsedArtists = parseArtistsDetails(artists);
+        const initialLyricsList = initializeAllLyrics(parsedArtists, numTracks);
+        console.log('initial list:', initialLyricsList);
 
         /* Step 2: get top tracks per artist */
-        const allTopTracks = await getAllTopTracks(parsedArtists, 2);
+        const allTopTracks = await getAllTopTracks(parsedArtists, numTracks);
         console.log('allTopTracks result:', allTopTracks);
+        const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
+        console.log('detailed list:', detailedLyricsList);
 
         /* Step 3: get snippets for each track */
         const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
@@ -166,8 +200,7 @@ const Snippets = () => {
         setArtistsList(parsedArtists);
         setTopTracks(allTopTracks);
         setTrackSnippets(topTrackSnippets);
-        
-
+      
       }
     }
 
@@ -190,7 +223,7 @@ const Snippets = () => {
 
   return (
     <div className="Snippets">
-      {console.log('<Snippets /> render')}
+      {/* {console.log('<Snippets /> render')} */}
       <h1>Snippets</h1>
       <h2>Artists</h2>
       <ul>
