@@ -13,6 +13,7 @@ const Snippets = () => {
   const [artistsList, setArtistsList] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
   const [trackSnippets, setTrackSnippets] = useState([]);
+  // const [allLyrics, setAllLyrics] = useState([]);
 
   const getArtists = async (name, number) => {
     const QUERY = `artist.search?q_artist=${name}&page_size=${number}`;
@@ -21,14 +22,28 @@ const Snippets = () => {
     const result = await axios.get(requestURL);
     console.log('getArtists -- axios.get result:', result);
 
-    const artist_list = result.data.message.body.artist_list;
-    const artistsNameAndId = artist_list.map(artist => ({ 
-      artist_name: artist.artist.artist_name,
-      artist_id: artist.artist.artist_id,
+    const responseBody = result.data.message.body;
+    return responseBody;
+
+    // const artist_list = result.data.message.body.artist_list;
+    // const artistsNameAndId = artist_list.map(artist => ({ 
+    //   artist_name: artist.artist.artist_name,
+    //   artist_id: artist.artist.artist_id,
+    // }))
+
+    // console.log('getting artist list:', artistsNameAndId);
+    // return artistsNameAndId;
+  }
+
+  const parseArtistsDetails = (responseBody) => {
+    const artist_list = responseBody.artist_list;
+    const artistNamesAndIds = artist_list.map(entry => ({ 
+      artist_name: entry.artist.artist_name,
+      artist_id: entry.artist.artist_id,
     }))
 
-    console.log('getting artist list:', artistsNameAndId);
-    return artistsNameAndId;
+    console.log('parsed artist list:', artistNamesAndIds);
+    return artistNamesAndIds;
   }
 
   /* get one artist's top tracks */
@@ -99,28 +114,42 @@ const Snippets = () => {
   useEffect(() => {
     const startQueries = async () => {
       if (window.confirm('Query?')) {
-        /* Step 1: Get artist(s) */
+        // /* Step 1: Get artist(s) */
+        // const artists = await getArtists('frank ocean', 1);
+        // console.log('artists result:', artists);
+
+        // /* Step 2: get top tracks per artist */
+        // const allTopTracks = await getAllTopTracks(artists, 2);
+        // console.log('allTopTracks result:', allTopTracks);
+
+        // /* Step 3: get snippets for each track */
+        // const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
+        // console.log('topTrackSnippets result:', topTrackSnippets);
+
+        // /* Step 4: set state */
+        // setArtistsList(artists);
+        // setTopTracks(allTopTracks);
+        // setTrackSnippets(topTrackSnippets);
+
+        /* With separate parsers */
+        // Step 1: Get Artist(s)
         const artists = await getArtists('frank ocean', 1);
-        console.log('artists result:', artists) // Promise -- nope, not anymore
+        const parsedArtists = parseArtistsDetails(artists);
 
         /* Step 2: get top tracks per artist */
-        const allTopTracks = await getAllTopTracks(artists, 2);
+        const allTopTracks = await getAllTopTracks(parsedArtists, 2);
         console.log('allTopTracks result:', allTopTracks);
 
         /* Step 3: get snippets for each track */
-        // individual track
-        // const oneTrackSnippet = await getTrackSnippet('186133518');
-        // console.log('oneTrackSnippet result:', oneTrackSnippet);
-
         const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
         console.log('topTrackSnippets result:', topTrackSnippets);
 
-        
-        
-        /* set state */
-        setArtistsList(artists);
+        /* Step 4: set state */
+        setArtistsList(parsedArtists);
         setTopTracks(allTopTracks);
         setTrackSnippets(topTrackSnippets);
+        
+
       }
     }
 
