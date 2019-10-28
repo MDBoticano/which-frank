@@ -55,16 +55,31 @@ const Snippets = () => {
     const result = await axios.get(requestURL);
     console.log('getTopTracks -- axios.get result:', result);
 
-    const track_list = result.data.message.body.track_list;
-    const trackDetails = track_list.map(track => ({
-      track_name: track.track.track_name,
-      track_id: track.track.track_id,
-      album_name: track.track.album_name,
-      album_id: track.track.album_id,
+    const responseBody = result.data.message.body;
+    return responseBody;
+
+    // const track_list = result.data.message.body.track_list;
+    // const trackDetails = track_list.map(track => ({
+    //   track_name: track.track.track_name,
+    //   track_id: track.track.track_id,
+    //   album_name: track.track.album_name,
+    //   album_id: track.track.album_id,
+    // }))
+
+    // console.log('getting top tracks:', trackDetails);
+    // return trackDetails;
+  }
+
+  const parseArtistTopTracks = (responseBody) => {
+    const topTracks = responseBody.track_list;
+    const topTracksDetails = topTracks.map(entry => ({
+      track_name: entry.track.track_name,
+      track_id: entry.track.track_id,
+      album_name: entry.track.album_name,
+      album_id: entry.track.album_id,
     }))
 
-    console.log('getting top tracks:', trackDetails);
-    return trackDetails;
+    return topTracksDetails;
   }
 
   /* get multiple artist's top tracks */
@@ -73,10 +88,12 @@ const Snippets = () => {
     for (let i = 0; i < artistsList.length; i++) {
       const artistName = artistsList[i].artist_name;
       const topTracks = await getArtistTopTracks(artistName, number);
+      const parsedTopTracks = parseArtistTopTracks(topTracks);
       console.log(artistName, topTracks);
 
       // allTracks.push(topTracks);
-      allTracks = [...allTracks, topTracks];
+      // allTracks = [...allTracks, topTracks];
+      allTracks = [...allTracks, parsedTopTracks];
       console.log('adding to allTracks');
     }
     console.log('done looping');
@@ -133,7 +150,8 @@ const Snippets = () => {
 
         /* With separate parsers */
         // Step 1: Get Artist(s)
-        const artists = await getArtists('frank ocean', 1);
+        // const artists = await getArtists('frank ocean', 1);
+        const artists = await getArtists('21', 2);
         const parsedArtists = parseArtistsDetails(artists);
 
         /* Step 2: get top tracks per artist */
