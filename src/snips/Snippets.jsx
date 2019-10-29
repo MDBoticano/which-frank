@@ -16,7 +16,7 @@ const Snippets = () => {
   const [artistsList, setArtistsList] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
   const [trackSnippets, setTrackSnippets] = useState([]);
-  // const [allLyrics, setAllLyrics] = useState([]);
+  const [allLyrics, setAllLyrics] = useState([]);
 
   const getArtists = async (name, number) => {
     const QUERY = `artist.search?q_artist=${name}&page_size=${number}`;
@@ -139,18 +139,25 @@ const Snippets = () => {
   }
 
   /**
-   * FIXME: incompatible with current TopTracks implementation 
    * This function assumes a 1d array with all topTracks in one array
-   * Currently, topTracks is one array perArtist
-   * either do fancy math to convert the dimensions, or restructure topTracks getter
    */
   const addTopTracksToAllLyrics = (allLyrics, topTracks) => {
-    // if (allLyrics.length !== topTracks.length) { return allLyrics }
+    if (allLyrics.length !== topTracks.length) { return allLyrics }
     for (let i = 0; i < allLyrics.length; i++) {
       allLyrics[i].track_name = topTracks[i].track_name;
       allLyrics[i].track_id = topTracks[i].track_id;
       allLyrics[i].album_name = topTracks[i].album_name;
       allLyrics[i].album_id = topTracks[i].album_id;
+    }
+    return allLyrics;
+  }
+
+  /**
+   * 
+   */
+  const addSnippetToAllLyrics = (allLyrics, lyricsList) => {
+    for (let i = 0; i < allLyrics.length; i++) {
+      allLyrics[i].snippet = lyricsList[i];
     }
     return allLyrics;
   }
@@ -188,17 +195,20 @@ const Snippets = () => {
         const allTopTracks = await getAllTopTracks(parsedArtists, numTracks);
         console.log('allTopTracks result:', allTopTracks);
         const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
-        console.log('detailed list:', detailedLyricsList);
+        // console.log('detailed list:', detailedLyricsList);
 
         /* Step 3: get snippets for each track */
         const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
-        console.log('topTrackSnippets result:', topTrackSnippets);
+        const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
+        console.log('allLyrics:', completedAllLyrics);
+
+        // console.log('topTrackSnippets result:', topTrackSnippets);
 
         /* Step 4: set state */
         setArtistsList(parsedArtists);
         setTopTracks(allTopTracks);
         setTrackSnippets(topTrackSnippets);
-      
+        setAllLyrics(completedAllLyrics);
       }
     }
 
@@ -208,7 +218,7 @@ const Snippets = () => {
 
   const displayTopTracks = (tracksObj) => (
     tracksObj && tracksObj.map(topTrack => {
-      console.log('top track', topTrack);
+      // console.log('top track', topTrack);
       // return topTracksSet.map(track => {
         // console.log(track, track.track_name);
         return <p key={topTrack.track_id}>{topTrack.track_name}</p>
@@ -218,6 +228,17 @@ const Snippets = () => {
 
   const displayTrackSnippets = (snippets) => {
     return snippets.map((snip,index) => <li key={index}>{snip}</li>)
+  }
+
+  const displayAllLyrics = (lyricsList) => {
+    return lyricsList.map(lyric => (
+      <li key={lyric.track_id}>
+         <p>{lyric.snippet}</p>
+         <p>{lyric.track_name}</p>
+         <p>{lyric.album_name}</p>
+         <p>{lyric.artist_name}</p>
+      </li>
+    ))
   }
 
   return (
@@ -237,6 +258,10 @@ const Snippets = () => {
       <h2>Track Snippets</h2>
       <ul>
         {trackSnippets && displayTrackSnippets(trackSnippets)}
+      </ul>
+      <h2>All Lyrics</h2>
+      <ul>
+        {allLyrics && displayAllLyrics(allLyrics)}
       </ul>
     </div>
   )
