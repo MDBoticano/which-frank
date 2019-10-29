@@ -78,7 +78,7 @@ const Snippets = () => {
 
       // allTracks.push(topTracks);
       // allTracks = [...allTracks, topTracks];
-      allTracks = [...allTracks, parsedTopTracks];
+      allTracks = [...allTracks, ...parsedTopTracks];
       console.log('adding to allTracks');
     }
     console.log('done looping');
@@ -107,15 +107,13 @@ const Snippets = () => {
   const getAllTrackSnippets = async (tracks) => {
     let allSnippets = [];
     for (let i = 0; i < tracks.length; i++ ) {
-      const trackArray = tracks[i];
-      for (let j = 0; j < trackArray.length; j++) {
-        const trackId = trackArray[j].track_id;
-        console.log('track id', trackId);
-        const snippetResponse = await getTrackSnippet(trackId);
-        const snippet = parseSnippet(snippetResponse);
-        console.log('lyric snippet', snippet);
-        allSnippets = [...allSnippets, snippet];
-      }
+      const currentTrack = tracks[i];
+      const trackId = currentTrack.track_id;
+      console.log('track id', trackId);
+      const snippetResponse = await getTrackSnippet(trackId);
+      const snippet = parseSnippet(snippetResponse);
+      console.log('lyric snippet', snippet);
+      allSnippets = [...allSnippets, snippet];
     }
     return allSnippets;
   }
@@ -209,11 +207,12 @@ const Snippets = () => {
   }, [])
 
   const displayTopTracks = (tracksObj) => (
-    tracksObj && tracksObj.map(topTracksSet => {
-      return topTracksSet.map(track => {
+    tracksObj && tracksObj.map(topTrack => {
+      console.log('top track', topTrack);
+      // return topTracksSet.map(track => {
         // console.log(track, track.track_name);
-        return <p key={track.track_id}>{track.track_name}</p>
-      })
+        return <p key={topTrack.track_id}>{topTrack.track_name}</p>
+      // })
     })
   )
 
