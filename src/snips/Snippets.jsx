@@ -17,6 +17,7 @@ const Snippets = () => {
   const [topTracks, setTopTracks] = useState([]);
   const [trackSnippets, setTrackSnippets] = useState([]);
   const [allLyrics, setAllLyrics] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
 
   const getArtists = async (name, number) => {
     const QUERY = `artist.search?q_artist=${name}&page_size=${number}`;
@@ -40,8 +41,6 @@ const Snippets = () => {
     return artistNamesAndIds;
   }
 
-
-
   /* get one artist's top tracks */
   const getArtistTopTracks = async (artist, number) => {
     const QUERY = `track.search?q_artist=${artist}`;
@@ -57,14 +56,18 @@ const Snippets = () => {
 
   const parseArtistTopTracks = (responseBody) => {
     const topTracks = responseBody.track_list;
-    const topTracksDetails = topTracks.map(entry => ({
-      track_name: entry.track.track_name,
-      track_id: entry.track.track_id,
-      album_name: entry.track.album_name,
-      album_id: entry.track.album_id,
-    }))
-
+    const topTracksDetails = topTracks.map(entry => {
+      return ({
+        track_name: entry.track.track_name,
+        track_id: entry.track.track_id,
+        album_name: entry.track.album_name,
+        album_id: entry.track.album_id,
+        has_lyrics: entry.track.has_lyrics,
+      })
+    })
     return topTracksDetails;
+    // const filteredTracks = topTracksDetails.filter(entry => entry !== undefined)
+    // return filteredTracks;    
   }
 
   /* get multiple artist's top tracks */
@@ -99,8 +102,11 @@ const Snippets = () => {
   }
 
   const parseSnippet = (responseBody) => {
-    const snippet = responseBody.snippet.snippet_body;
-    return snippet;
+    if (responseBody.snippet && responseBody.snippet.snippet_body) {
+      const snippet = responseBody.snippet.snippet_body;
+      return snippet;
+    }
+    return '(oops, there\'s no lyrics snippet)';
   }
 
   /* get the snippet for multiple songs */
@@ -131,6 +137,7 @@ const Snippets = () => {
           track_id: '',
           album_name: '',
           album_id: '',
+          has_lyrics: '',
         });
       }
     }
@@ -148,6 +155,7 @@ const Snippets = () => {
       allLyrics[i].track_id = topTracks[i].track_id;
       allLyrics[i].album_name = topTracks[i].album_name;
       allLyrics[i].album_id = topTracks[i].album_id;
+      allLyrics[i].has_lyrics = topTracks[i].has_lyrics;
     }
     return allLyrics;
   }
@@ -184,6 +192,7 @@ const Snippets = () => {
         // setTrackSnippets(topTrackSnippets);
 
         /* With separate parsers */
+        setIsFetching(true);
         // Step 1: Get Artist(s)
         // const artists = await getArtists('frank ocean', 1);
         const artists = await getArtists(nameArtist, numArtists);
@@ -209,6 +218,7 @@ const Snippets = () => {
         setTopTracks(allTopTracks);
         setTrackSnippets(topTrackSnippets);
         setAllLyrics(completedAllLyrics);
+        setIsFetching(false);
       }
     }
 
@@ -244,6 +254,7 @@ const Snippets = () => {
   return (
     <div className="Snippets">
       {/* {console.log('<Snippets /> render')} */}
+      { isFetching && <p>loading...</p>}
       <h1>Snippets</h1>
       <h2>Artists</h2>
       <ul>
