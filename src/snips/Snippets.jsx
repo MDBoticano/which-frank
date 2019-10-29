@@ -5,18 +5,29 @@ import axios from 'axios';
 /* CONSTS */
 const api_key = process.env.REACT_APP_MUSIXMATCH_API_KEY;
 const API_KEY = `&apikey=${api_key}`;
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 const API = "https://api.musixmatch.com/ws/1.1/";
+
+/**
+ * CORS PROXY -- we need this to enable cross-origin resources
+ */
+// public proxy, has limits of 200/hr
+// const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"; 
+
+// self-hosted (ran locally) -- clone cors-anywhere, npm i then npm start
+const CORS_PROXY = "http://localhost:8080/"; 
+
 
 
 const Snippets = () => {
   const [nameArtist] = useState('21');
   const [numArtists] = useState(2);
   const [numTracks] = useState(2);
+
   const [artistsList, setArtistsList] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
   const [trackSnippets, setTrackSnippets] = useState([]);
   const [allLyrics, setAllLyrics] = useState([]);
+
   const [isFetching, setIsFetching] = useState(false);
 
   const getArtists = async (name, number) => {
@@ -63,6 +74,7 @@ const Snippets = () => {
         album_name: entry.track.album_name,
         album_id: entry.track.album_id,
         has_lyrics: entry.track.has_lyrics,
+        explicit: entry.track.explicit,
       })
     })
     return topTracksDetails;
@@ -104,9 +116,16 @@ const Snippets = () => {
   const parseSnippet = (responseBody) => {
     if (responseBody.snippet && responseBody.snippet.snippet_body) {
       const snippet = responseBody.snippet.snippet_body;
-      return snippet;
+      const language = responseBody.snippet.snippet_language;
+      return { 
+        snippet: snippet,
+        snippet_language: language,
+      };
     }
-    return '(oops, there\'s no lyrics snippet)';
+    return {
+      snippet: null,
+      snippet_language: null
+    };
   }
 
   /* get the snippet for multiple songs */
@@ -138,6 +157,7 @@ const Snippets = () => {
           album_name: '',
           album_id: '',
           has_lyrics: '',
+          explicit: '',
         });
       }
     }
@@ -156,6 +176,7 @@ const Snippets = () => {
       allLyrics[i].album_name = topTracks[i].album_name;
       allLyrics[i].album_id = topTracks[i].album_id;
       allLyrics[i].has_lyrics = topTracks[i].has_lyrics;
+      allLyrics[i].explicit = topTracks[i].explicit;
     }
     return allLyrics;
   }
@@ -165,7 +186,8 @@ const Snippets = () => {
    */
   const addSnippetToAllLyrics = (allLyrics, lyricsList) => {
     for (let i = 0; i < allLyrics.length; i++) {
-      allLyrics[i].snippet = lyricsList[i];
+      allLyrics[i].snippet = lyricsList[i].snippet;
+      allLyrics[i].snippet_language = lyricsList[i].snippet_language;
     }
     return allLyrics;
   }
@@ -174,24 +196,6 @@ const Snippets = () => {
   useEffect(() => {
     const startQueries = async () => {
       if (window.confirm('Query?')) {
-        // /* Step 1: Get artist(s) */
-        // const artists = await getArtists('frank ocean', 1);
-        // console.log('artists result:', artists);
-
-        // /* Step 2: get top tracks per artist */
-        // const allTopTracks = await getAllTopTracks(artists, 2);
-        // console.log('allTopTracks result:', allTopTracks);
-
-        // /* Step 3: get snippets for each track */
-        // const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
-        // console.log('topTrackSnippets result:', topTrackSnippets);
-
-        // /* Step 4: set state */
-        // setArtistsList(artists);
-        // setTopTracks(allTopTracks);
-        // setTrackSnippets(topTrackSnippets);
-
-        /* With separate parsers */
         setIsFetching(true);
         // Step 1: Get Artist(s)
         // const artists = await getArtists('frank ocean', 1);
@@ -237,13 +241,15 @@ const Snippets = () => {
   )
 
   const displayTrackSnippets = (snippets) => {
-    return snippets.map((snip,index) => <li key={index}>{snip}</li>)
+    return snippets.map((snip,index) => (
+      <li key={index}>{snip.snippet}</li>
+    ))
   }
 
   const displayAllLyrics = (lyricsList) => {
     return lyricsList.map(lyric => (
       <li key={lyric.track_id}>
-         <p>{lyric.snippet}</p>
+         <p>{lyric.snippet} ({lyric.snippet_language})</p>
          <p>{lyric.track_name}</p>
          <p>{lyric.album_name}</p>
          <p>{lyric.artist_name}</p>
@@ -254,8 +260,8 @@ const Snippets = () => {
   return (
     <div className="Snippets">
       {/* {console.log('<Snippets /> render')} */}
-      { isFetching && <p>loading...</p>}
       <h1>Snippets</h1>
+      { isFetching && <p>loading...</p>}
       <h2>Artists</h2>
       <ul>
         {artistsList && artistsList.map( a => 
