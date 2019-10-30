@@ -19,26 +19,16 @@ const CORS_PROXY = "http://localhost:8080/";
 
 
 const Snippets = () => {
-  // const [nameArtist] = useState('21');
-  // const [numArtists] = useState(2);
-  // const [numTracks] = useState(2);
-  const [nameArtist] = useState('James');
-  const [numArtists] = useState(5);
-  const [numTracks] = useState(1);
-
-  // const [artistsList, setArtistsList] = useState([]);
-  // const [topTracks, setTopTracks] = useState([]);
-  // const [trackSnippets, setTrackSnippets] = useState([]);
   const [allLyrics, setAllLyrics] = useState([]);
-
   const [isFetching, setIsFetching] = useState(false);
+  const [loadMessage, setLoadMessage] = useState('');
 
   const getArtists = async (name, number) => {
     const QUERY = `artist.search?q_artist=${name}&page_size=${number}`;
     const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
     
     const result = await axios.get(requestURL);
-    console.log('getArtists -- axios.get result:', result);
+    // console.log('getArtists -- axios.get result:', result);
 
     const responseBody = result.data.message.body;
     return responseBody;
@@ -51,7 +41,7 @@ const Snippets = () => {
       artist_id: entry.artist.artist_id,
     }))
 
-    console.log('parsed artist list:', artistNamesAndIds);
+    // console.log('parsed artist list:', artistNamesAndIds);
     return artistNamesAndIds;
   }
 
@@ -62,7 +52,7 @@ const Snippets = () => {
     const requestURL = `${CORS_PROXY}${API}${QUERY}${MODIFIERS}${API_KEY}`;
     
     const result = await axios.get(requestURL);
-    console.log('getTopTracks -- axios.get result:', artist, result);
+    // console.log('getTopTracks -- axios.get result:', artist, result);
 
     const responseBody = result.data.message.body;
     return responseBody;
@@ -80,9 +70,7 @@ const Snippets = () => {
         explicit: entry.track.explicit,
       })
     })
-    return topTracksDetails;
-    // const filteredTracks = topTracksDetails.filter(entry => entry !== undefined)
-    // return filteredTracks;    
+    return topTracksDetails; 
   }
 
   /* get multiple artist's top tracks */
@@ -92,14 +80,12 @@ const Snippets = () => {
       const artistName = artistsList[i].artist_name;
       const topTracks = await getArtistTopTracks(artistName, number);
       const parsedTopTracks = parseArtistTopTracks(topTracks);
-      console.log(artistName, topTracks);
+      // console.log(artistName, topTracks);
 
-      // allTracks.push(topTracks);
-      // allTracks = [...allTracks, topTracks];
       allTracks = [...allTracks, ...parsedTopTracks];
-      console.log('adding to allTracks');
+      // console.log('adding to allTracks');
     }
-    console.log('done looping');
+    // console.log('done looping');
     return allTracks;
   }
 
@@ -108,10 +94,8 @@ const Snippets = () => {
     const QUERY = `track.snippet.get?track_id=${trackId}`;
     const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
     const result = await axios.get(requestURL);
-    console.log('get one trackSnippet -- axios.get result:', result);
+    // console.log('get one trackSnippet -- axios.get result:', result);
 
-    // const lyricString = result.data.message.body.snippet.snippet_body;
-    // return lyricString;
     const responseBody = result.data.message.body;
     return responseBody;
   }
@@ -137,10 +121,10 @@ const Snippets = () => {
     for (let i = 0; i < tracks.length; i++ ) {
       const currentTrack = tracks[i];
       const trackId = currentTrack.track_id;
-      console.log('track id', trackId);
+      // console.log('track id', trackId);
       const snippetResponse = await getTrackSnippet(trackId);
       const snippet = parseSnippet(snippetResponse);
-      console.log('lyric snippet', snippet);
+      // console.log('lyric snippet', snippet);
       allSnippets = [...allSnippets, snippet];
     }
     return allSnippets;
@@ -195,37 +179,45 @@ const Snippets = () => {
     return allLyrics;
   }
 
-  const filterAllLyrics = (lyrics) => {
+  const filterAllLyrics = (lyrics, name) => {
     let lyricsList = [...lyrics];
-    const removeNoLyrics = true;
+    const removeNoLyrics = false; // True: remove null, False: use track name as title
     const removeExplicit = true;
     const removeNonEnglish = true;
     const removeAliasMatches = true;
 
     if (removeAliasMatches) { 
       const noAliasMatches = lyricsList.filter(lyric => 
-        (lyric.artist_name).includes(nameArtist)
+        (lyric.artist_name).includes(name)
       )
       lyricsList = noAliasMatches;
-      console.log('filtering out artists with alias matches', lyricsList);
+      // console.log('filtering out artists with alias matches', lyricsList);
     }
 
     if (removeNoLyrics) {
       const hasLyrics = lyricsList.filter(lyric => lyric.snippet !== null);
       lyricsList = hasLyrics;
-      console.log('filtering out songs without lyrics', lyricsList);
+      // console.log('filtering out songs without lyrics', lyricsList);
+    } else {
+      const titleAsSnips = lyricsList.map(lyric => {
+        if (lyric.snippet === null) {
+          lyric.snippet = lyric.track_name;
+        }
+        return lyric;
+      })
+      return titleAsSnips;
     }
 
     if (removeExplicit) {
       const noExplicit = lyricsList.filter(lyric => lyric.explicit !== 1);
       lyricsList = noExplicit;
-      console.log('filtering out explicit lyrics', lyricsList);
+      // console.log('filtering out explicit lyrics', lyricsList);
     }
     
     if (removeNonEnglish) {
       const noNonEng = lyricsList.filter(lyric => lyric.snippet_language === 'en');
       lyricsList = noNonEng;
-      console.log('filtering out non-English lyrics', lyricsList);
+      // console.log('filtering out non-English lyrics', lyricsList);
     }
 
 
@@ -237,34 +229,73 @@ const Snippets = () => {
     const startQueries = async () => {
       if (window.confirm('Query?')) {
         setIsFetching(true);
-        // Step 1: Get Artist(s)
-        // const artists = await getArtists('frank ocean', 1);
-        const artists = await getArtists(nameArtist, numArtists);
-        const parsedArtists = parseArtistsDetails(artists);
-        const initialLyricsList = initializeAllLyrics(parsedArtists, numTracks);
-        console.log('initial list:', initialLyricsList);
 
-        /* Step 2: get top tracks per artist */
-        const allTopTracks = await getAllTopTracks(parsedArtists, numTracks);
-        console.log('allTopTracks result:', allTopTracks);
-        const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
-        // console.log('detailed list:', detailedLyricsList);
+        // const makeAllLyrics = async () => {
+        //   // Step 1: Get Artist(s)
+        //   const artists = await getArtists(nameArtist, numArtists);
+        //   const parsedArtists = parseArtistsDetails(artists);
+        //   const initialLyricsList = initializeAllLyrics(parsedArtists, numTracks);
+        //   // console.log('initial list:', initialLyricsList);
 
-        /* Step 3: get snippets for each track */
-        const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
-        const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
-        console.log('allLyrics:', completedAllLyrics);
-        const filteredAllLyrics = filterAllLyrics(completedAllLyrics);
-        console.log('allLyrics filtered:', filteredAllLyrics);
+        //   /* Step 2: get top tracks per artist */
+        //   const allTopTracks = await getAllTopTracks(parsedArtists, numTracks);
+        //   // console.log('allTopTracks result:', allTopTracks);
+        //   const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
+        //   // console.log('detailed list:', detailedLyricsList);
 
-        // console.log('topTrackSnippets result:', topTrackSnippets);
+        //   /* Step 3: get snippets for each track */
+        //   const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
+        //   const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
+        //   // console.log('allLyrics:', completedAllLyrics);
+        //   const filteredAllLyrics = filterAllLyrics(completedAllLyrics);
+        //   // console.log('allLyrics filtered:', filteredAllLyrics);
 
+        //   return filteredAllLyrics;
+        // }
+
+        const makeCustomLyrics = async (customArtistsList, customNumTracks) => {
+          let customLyrics = [];
+          for (let i = 0; i <customArtistsList.length; i++ ){
+            const customArtistName = customArtistsList[i];
+
+            setLoadMessage(`getting ${customArtistName}'s details...`);
+            /* Step 1: get the artist's details */
+            const artists = await getArtists(customArtistName, 1);
+            const parsedArtists = parseArtistsDetails(artists);
+            const initialLyricsList = initializeAllLyrics(parsedArtists, customNumTracks);
+            // console.log('initial list:', initialLyricsList);
+  
+            setLoadMessage(`getting ${customArtistName}'s tracks...`);
+            /* Step 2: get top tracks per artist */
+            const allTopTracks = await getAllTopTracks(parsedArtists, customNumTracks);
+            // console.log('allTopTracks result:', allTopTracks);
+            const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
+            // console.log('detailed list:', detailedLyricsList);
+
+            setLoadMessage(`getting ${customArtistName}'s track snippets`);
+            /* Step 3: get snippets for each track */
+            const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
+            const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
+            // console.log('allLyrics:', completedAllLyrics);
+            const filteredAllLyrics = filterAllLyrics(completedAllLyrics, 'Frank');
+            // const filteredAllLyrics = completedAllLyrics;
+            // console.log('allLyrics filtered:', filteredAllLyrics);
+
+            customLyrics = [...customLyrics, ...filteredAllLyrics];
+
+            setLoadMessage('');
+          }
+          return customLyrics;
+        }
+
+        // const filteredAllLyrics = await makeAllLyrics();
+        // console.log('outside maker', filteredAllLyrics);
+
+        const customAllLyrics = await makeCustomLyrics(['Frank Sinatra', 'Frank Ocean'], 5);
+        console.log('ALL LYRICS', customAllLyrics);
+       
         /* Step 4: set state */
-        // setArtistsList(parsedArtists);
-        // setTopTracks(allTopTracks);
-        // setTrackSnippets(topTrackSnippets);
-        // setAllLyrics(completedAllLyrics);
-        setAllLyrics(filteredAllLyrics);
+        setAllLyrics(customAllLyrics);
         setIsFetching(false);
       }
     }
@@ -273,27 +304,11 @@ const Snippets = () => {
   // eslint-disable-next-line
   }, [])
 
-  // const displayTopTracks = (tracksObj) => (
-  //   tracksObj && tracksObj.map(topTrack => {
-  //     // console.log('top track', topTrack);
-  //     // return topTracksSet.map(track => {
-  //       // console.log(track, track.track_name);
-  //       return <p key={topTrack.track_id}>{topTrack.track_name}</p>
-  //     // })
-  //   })
-  // )
-
-  // const displayTrackSnippets = (snippets) => {
-  //   return snippets.map((snip,index) => (
-  //     <li key={index}>{snip.snippet}</li>
-  //   ))
-  // }
-
   const displayAllLyrics = (lyricsList) => {
     return lyricsList.map((lyric, index) => (
       <li key={lyric.track_id}>
         <h3>{index + 1}</h3>
-        <p>{lyric.snippet} ({lyric.snippet_language})</p>
+        <p>{lyric.snippet}</p>
         <p>{lyric.track_name}</p>
         <p>{lyric.album_name}</p>
         <p>{lyric.artist_name}</p>
@@ -301,28 +316,17 @@ const Snippets = () => {
     ))
   }
 
-
-
   return (
     <div className="Snippets">
       {/* {console.log('<Snippets /> render')} */}
       <h1>Snippets</h1>
-      { isFetching && <p>loading...</p>}
-      {/* <h2>Artists</h2>
-      <ul>
-        {artistsList && artistsList.map( a => 
-          <li key={a.artist_id}>{a.artist_name}</li>
-        )}
-      </ul>
-      <h2>Top Tracks</h2>
-      <ul>
-        {topTracks && displayTopTracks(topTracks)}
-      </ul>
-      <h2>Track Snippets</h2>
-      <ul>
-        {trackSnippets && displayTrackSnippets(trackSnippets)}
-      </ul> */}
       <h2>All Lyrics</h2>
+      { isFetching && 
+        <div>
+          <p>loading...</p>
+          <p>{loadMessage}</p>
+        </div>
+        }
       <ul>
         {allLyrics && displayAllLyrics(allLyrics)}
       </ul>
