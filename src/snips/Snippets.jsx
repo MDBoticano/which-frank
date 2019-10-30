@@ -219,48 +219,36 @@ const Snippets = () => {
       lyricsList = noNonEng;
       // console.log('filtering out non-English lyrics', lyricsList);
     }
-
-
     return lyricsList;
   }
-
 
   useEffect(() => {
     const startQueries = async () => {
       if (window.confirm('Query?')) {
         setIsFetching(true);
 
-        // const makeAllLyrics = async () => {
-        //   // Step 1: Get Artist(s)
-        //   const artists = await getArtists(nameArtist, numArtists);
-        //   const parsedArtists = parseArtistsDetails(artists);
-        //   const initialLyricsList = initializeAllLyrics(parsedArtists, numTracks);
-        //   // console.log('initial list:', initialLyricsList);
-
-        //   /* Step 2: get top tracks per artist */
-        //   const allTopTracks = await getAllTopTracks(parsedArtists, numTracks);
-        //   // console.log('allTopTracks result:', allTopTracks);
-        //   const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
-        //   // console.log('detailed list:', detailedLyricsList);
-
-        //   /* Step 3: get snippets for each track */
-        //   const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
-        //   const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
-        //   // console.log('allLyrics:', completedAllLyrics);
-        //   const filteredAllLyrics = filterAllLyrics(completedAllLyrics);
-        //   // console.log('allLyrics filtered:', filteredAllLyrics);
-
-        //   return filteredAllLyrics;
-        // }
-
-        const makeCustomLyrics = async (customArtistsList, customNumTracks) => {
+        /**
+         * 
+         * @param {*} customArtistsList - array of artist string names
+         * @param {*} customNumTracks - # of tracks per artists
+         * NOTE: To make it work like the old way, you pass in one name in the 
+         * array but then you make the amount of artists to get whatever # you
+         * want to get. e.g. makeCustomlyrics()
+         */
+        const makeCustomLyrics = async (customArtistsList, customNumTracks, customNumArtists = 1) => {
           let customLyrics = [];
+          let numArtists = -1;
+          if (customArtistsList.length === 1) {
+            numArtists = customNumArtists;
+          } else {
+            numArtists = 1;
+          }
           for (let i = 0; i <customArtistsList.length; i++ ){
             const customArtistName = customArtistsList[i];
 
             setLoadMessage(`getting ${customArtistName}'s details...`);
             /* Step 1: get the artist's details */
-            const artists = await getArtists(customArtistName, 1);
+            const artists = await getArtists(customArtistName, numArtists);
             const parsedArtists = parseArtistsDetails(artists);
             const initialLyricsList = initializeAllLyrics(parsedArtists, customNumTracks);
             // console.log('initial list:', initialLyricsList);
@@ -288,10 +276,10 @@ const Snippets = () => {
           return customLyrics;
         }
 
-        // const filteredAllLyrics = await makeAllLyrics();
-        // console.log('outside maker', filteredAllLyrics);
-
-        const customAllLyrics = await makeCustomLyrics(['Frank Sinatra', 'Frank Ocean'], 5);
+        // const customAllLyrics = await makeCustomLyrics(['Frank'], 1, 5); // Old-school way
+        const customAllLyrics = await makeCustomLyrics(['Frank Sinatra', 'Frank Ocean'], 5); // new way
+        // Possible new way: makeCustomLyrics(['Frank', 'Bob'], 5, 3) --> 3 Franks, 3 Bobs, each with 5 lyrics
+        
         console.log('ALL LYRICS', customAllLyrics);
        
         /* Step 4: set state */
