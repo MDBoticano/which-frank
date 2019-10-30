@@ -19,13 +19,16 @@ const CORS_PROXY = "http://localhost:8080/";
 
 
 const Snippets = () => {
-  const [nameArtist] = useState('21');
-  const [numArtists] = useState(2);
-  const [numTracks] = useState(2);
+  // const [nameArtist] = useState('21');
+  // const [numArtists] = useState(2);
+  // const [numTracks] = useState(2);
+  const [nameArtist] = useState('James');
+  const [numArtists] = useState(5);
+  const [numTracks] = useState(1);
 
-  const [artistsList, setArtistsList] = useState([]);
-  const [topTracks, setTopTracks] = useState([]);
-  const [trackSnippets, setTrackSnippets] = useState([]);
+  // const [artistsList, setArtistsList] = useState([]);
+  // const [topTracks, setTopTracks] = useState([]);
+  // const [trackSnippets, setTrackSnippets] = useState([]);
   const [allLyrics, setAllLyrics] = useState([]);
 
   const [isFetching, setIsFetching] = useState(false);
@@ -192,6 +195,43 @@ const Snippets = () => {
     return allLyrics;
   }
 
+  const filterAllLyrics = (lyrics) => {
+    let lyricsList = [...lyrics];
+    const removeNoLyrics = true;
+    const removeExplicit = true;
+    const removeNonEnglish = true;
+    const removeAliasMatches = true;
+
+    if (removeAliasMatches) { 
+      const noAliasMatches = lyricsList.filter(lyric => 
+        (lyric.artist_name).includes(nameArtist)
+      )
+      lyricsList = noAliasMatches;
+      console.log('filtering out artists with alias matches', lyricsList);
+    }
+
+    if (removeNoLyrics) {
+      const hasLyrics = lyricsList.filter(lyric => lyric.snippet !== null);
+      lyricsList = hasLyrics;
+      console.log('filtering out songs without lyrics', lyricsList);
+    }
+
+    if (removeExplicit) {
+      const noExplicit = lyricsList.filter(lyric => lyric.explicit !== 1);
+      lyricsList = noExplicit;
+      console.log('filtering out explicit lyrics', lyricsList);
+    }
+    
+    if (removeNonEnglish) {
+      const noNonEng = lyricsList.filter(lyric => lyric.snippet_language === 'en');
+      lyricsList = noNonEng;
+      console.log('filtering out non-English lyrics', lyricsList);
+    }
+
+
+    return lyricsList;
+  }
+
 
   useEffect(() => {
     const startQueries = async () => {
@@ -214,14 +254,17 @@ const Snippets = () => {
         const topTrackSnippets = await getAllTrackSnippets(allTopTracks);
         const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
         console.log('allLyrics:', completedAllLyrics);
+        const filteredAllLyrics = filterAllLyrics(completedAllLyrics);
+        console.log('allLyrics filtered:', filteredAllLyrics);
 
         // console.log('topTrackSnippets result:', topTrackSnippets);
 
         /* Step 4: set state */
-        setArtistsList(parsedArtists);
-        setTopTracks(allTopTracks);
-        setTrackSnippets(topTrackSnippets);
-        setAllLyrics(completedAllLyrics);
+        // setArtistsList(parsedArtists);
+        // setTopTracks(allTopTracks);
+        // setTrackSnippets(topTrackSnippets);
+        // setAllLyrics(completedAllLyrics);
+        setAllLyrics(filteredAllLyrics);
         setIsFetching(false);
       }
     }
@@ -230,39 +273,42 @@ const Snippets = () => {
   // eslint-disable-next-line
   }, [])
 
-  const displayTopTracks = (tracksObj) => (
-    tracksObj && tracksObj.map(topTrack => {
-      // console.log('top track', topTrack);
-      // return topTracksSet.map(track => {
-        // console.log(track, track.track_name);
-        return <p key={topTrack.track_id}>{topTrack.track_name}</p>
-      // })
-    })
-  )
+  // const displayTopTracks = (tracksObj) => (
+  //   tracksObj && tracksObj.map(topTrack => {
+  //     // console.log('top track', topTrack);
+  //     // return topTracksSet.map(track => {
+  //       // console.log(track, track.track_name);
+  //       return <p key={topTrack.track_id}>{topTrack.track_name}</p>
+  //     // })
+  //   })
+  // )
 
-  const displayTrackSnippets = (snippets) => {
-    return snippets.map((snip,index) => (
-      <li key={index}>{snip.snippet}</li>
-    ))
-  }
+  // const displayTrackSnippets = (snippets) => {
+  //   return snippets.map((snip,index) => (
+  //     <li key={index}>{snip.snippet}</li>
+  //   ))
+  // }
 
   const displayAllLyrics = (lyricsList) => {
-    return lyricsList.map(lyric => (
+    return lyricsList.map((lyric, index) => (
       <li key={lyric.track_id}>
-         <p>{lyric.snippet} ({lyric.snippet_language})</p>
-         <p>{lyric.track_name}</p>
-         <p>{lyric.album_name}</p>
-         <p>{lyric.artist_name}</p>
+        <h3>{index + 1}</h3>
+        <p>{lyric.snippet} ({lyric.snippet_language})</p>
+        <p>{lyric.track_name}</p>
+        <p>{lyric.album_name}</p>
+        <p>{lyric.artist_name}</p>
       </li>
     ))
   }
+
+
 
   return (
     <div className="Snippets">
       {/* {console.log('<Snippets /> render')} */}
       <h1>Snippets</h1>
       { isFetching && <p>loading...</p>}
-      <h2>Artists</h2>
+      {/* <h2>Artists</h2>
       <ul>
         {artistsList && artistsList.map( a => 
           <li key={a.artist_id}>{a.artist_name}</li>
@@ -275,7 +321,7 @@ const Snippets = () => {
       <h2>Track Snippets</h2>
       <ul>
         {trackSnippets && displayTrackSnippets(trackSnippets)}
-      </ul>
+      </ul> */}
       <h2>All Lyrics</h2>
       <ul>
         {allLyrics && displayAllLyrics(allLyrics)}
