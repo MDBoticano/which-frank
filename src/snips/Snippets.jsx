@@ -11,12 +11,10 @@ const API = "https://api.musixmatch.com/ws/1.1/";
  * CORS PROXY -- we need this to enable cross-origin resources
  */
 // public proxy, has limits of 200/hr
-// const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"; 
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"; 
 
-// self-hosted (ran locally) -- clone cors-anywhere, npm i then npm start
-const CORS_PROXY = "http://localhost:8080/"; 
-
-
+// self-hosted (ran locally) -- clone github.com/Rob--W/cors-anywhere
+// const CORS_PROXY = "http://localhost:8080/"; 
 
 const Snippets = () => {
   const [allLyrics, setAllLyrics] = useState([]);

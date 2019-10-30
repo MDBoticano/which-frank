@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 /* data imported, since no backend */
-import FrankLyrics from './data/FrankLyrics';
+import * as JSONLyrics from './data/FrankLyrics' ;
 // import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
 
 /* for lyrics API testing */
-import LyricsAPI from './lyrics-api/LyricsAPI';
+// import LyricsAPI from './lyrics-api/LyricsAPI';
+import { makeCustomLyrics } from './utilities/musixmatchAPIFuncs';
 
 /* Helper functions */
 import {
@@ -153,7 +154,7 @@ Score.propTypes = {
 const App = () => {
   /* state */
   // const [page, setPage] = useState('loading');
-  const [page, setPage] = useState('lyricsAPI');
+  const [page, setPage] = useState('home');
   const [allLyrics, setAllLyrics] = useState([]);
   const [shuffledLyrics, setShuffledLyrics] = useState([]);
   const [allArtists, setAllArtists] = useState([]);
@@ -162,13 +163,21 @@ const App = () => {
   /* helpers */
   const reshuffleLyrics = () => {
     const shuffledLyricsOrder = shuffleIndices(allLyrics.length);
-    const newShuffledLyrics = reorderArray(FrankLyrics, shuffledLyricsOrder);
+    const newShuffledLyrics = reorderArray(allLyrics, shuffledLyricsOrder);
     setShuffledLyrics(newShuffledLyrics);
   };
 
   /* load lyrics from 'backend' */
   useEffect(() => {
+    let FrankLyrics = {};
+    if (window.confirm("query")) {
+      FrankLyrics = makeCustomLyrics(['Frank Sinatra, Frank Ocean'], 5 );
+    } else {
+      FrankLyrics = JSONLyrics.FrankLyrics;
+    }
+   
     const lyricsLength = FrankLyrics.length;
+
     if (lyricsLength > 0) {
       // setPage('home');
       setAllLyrics(FrankLyrics);
@@ -219,12 +228,6 @@ const App = () => {
                 score={score}
                 setScore={setScore}
                 reshuffleLyrics={reshuffleLyrics}
-              />
-            );
-          case 'lyricsAPI':
-            return (
-              <LyricsAPI
-                setPage={setPage}
               />
             );
           default:

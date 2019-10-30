@@ -1,4 +1,4 @@
-const FrankLyrics = [
+export const FrankLyrics = [
   {
     songLyric: 'If it brings me to my knees, it\'s a bad religion',
     songName: 'Bad Religion',
@@ -80,5 +80,3 @@ const FrankLyrics = [
     id: 9,
   },
 ];
-
-export default FrankLyrics;
