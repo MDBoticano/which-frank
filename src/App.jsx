@@ -15,6 +15,9 @@ import {
   getUniqueValues, shuffleIndices, reorderArray, sumReducer,
 } from './utilities/helperFuncs';
 
+const api_key = process.env.REACT_APP_MUSIXMATCH_API_KEY;
+const API_KEY = `&apikey=${api_key}`;
+
 /* ------------------------------- Components ------------------------------- */
 /* Eventually, these components will become their own set of components */
 
@@ -27,16 +30,27 @@ const Loading = () => (
 );
 
 /* ---------- Page: Home ---------- */
-const Home = (props) => (
-  <div className="Home">
-    <button type="button" onClick={() => props.setPage('game')}>
-      {'Let\'s Play!'}
-    </button>
-  </div>
-);
+const Home = (props) => {
+  if (props.isDisabled) {
+    return (
+      <div className="Home">
+      <button type="button" onClick={() => props.setPage('game')} disabled>
+        {'loading...'}
+      </button>
+    </div>)
+  } else {
+    return (
+      <div className="Home">
+      <button type="button" onClick={() => props.setPage('game')} >
+        {'Let\'s Play!'}
+      </button>
+    </div>)
+  }
+};
 
 Home.propTypes = {
   setPage: PropTypes.func.isRequired,
+  isDisabled: PropTypes.bool.isRequired,
 };
 /* -------- End Page: Home -------- */
 
@@ -53,7 +67,7 @@ const Game = (props) => {
   };
 
   const checkGuess = (guess) => {
-    if (guess === activeLyric.artistName) {
+    if (guess === activeLyric.artist_name) {
       addScore(1);
     } else {
       addScore(0);
@@ -89,7 +103,7 @@ const Game = (props) => {
     <div className="Game">
       <div className="ActiveLyric">
         <p>{`Lyric ${numGuesses + 1} of ${props.allLyrics.length}`}</p>
-        <p>{activeLyric.songLyric}</p>
+        <p>{activeLyric.snippet}</p>
       </div>
       {makeGuessButtons(props.allArtists)}
     </div>
@@ -101,11 +115,10 @@ Game.propTypes = {
   setScore: PropTypes.func.isRequired,
   setPage: PropTypes.func.isRequired,
   allLyrics: PropTypes.arrayOf(PropTypes.shape({
-    songLyric: PropTypes.string.isRequired,
-    songName: PropTypes.string.isRequired,
-    artistName: PropTypes.string.isRequired,
-    albumName: PropTypes.string.isRequired,
-    albumReleaseDate: PropTypes.string.isRequired,
+    snippet: PropTypes.string.isRequired,
+    track_name: PropTypes.string.isRequired,
+    artist_name: PropTypes.string.isRequired,
+    album_name: PropTypes.string.isRequired,
   })).isRequired,
   allArtists: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
@@ -159,6 +172,7 @@ const App = () => {
   const [shuffledLyrics, setShuffledLyrics] = useState([]);
   const [allArtists, setAllArtists] = useState([]);
   const [score, setScore] = useState([]);
+  const [disablePlayButton, setDisablePlayButton] = useState(false);
 
   /* helpers */
   const reshuffleLyrics = () => {
@@ -169,28 +183,40 @@ const App = () => {
 
   /* load lyrics from 'backend' */
   useEffect(() => {
-    let FrankLyrics = {};
-    if (window.confirm("query")) {
-      FrankLyrics = makeCustomLyrics(['Frank Sinatra, Frank Ocean'], 5 );
-    } else {
-      FrankLyrics = JSONLyrics.FrankLyrics;
+
+    let FrankLyrics = [];
+
+    const promptCustom = async () => {
+      setDisablePlayButton(true);
+      if (window.confirm("query")) {
+        const asyncMake = async () => {
+          const customLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
+          console.log(customLyrics);
+          return customLyrics;
+        }
+        FrankLyrics = await asyncMake();
+      } else {
+        FrankLyrics = JSONLyrics.FrankLyrics;
+      }
+     
+      const lyricsLength = FrankLyrics.length;
+  
+      if (lyricsLength > 0) {
+        setAllLyrics(FrankLyrics);
+  
+        // shuffle and set the retrieved lyrics
+        const shuffledLyricsOrder = shuffleIndices(lyricsLength);
+        const newShuffledLyrics = reorderArray(FrankLyrics, shuffledLyricsOrder);
+        setShuffledLyrics(newShuffledLyrics);
+  
+        // get list of all artists
+        const uniqueArtists = getUniqueValues(FrankLyrics, 'artist_name');
+        setAllArtists(uniqueArtists);
+      }
+      setDisablePlayButton(false);
     }
-   
-    const lyricsLength = FrankLyrics.length;
 
-    if (lyricsLength > 0) {
-      // setPage('home');
-      setAllLyrics(FrankLyrics);
-
-      // shuffle and set the retrieved lyrics
-      const shuffledLyricsOrder = shuffleIndices(lyricsLength);
-      const newShuffledLyrics = reorderArray(FrankLyrics, shuffledLyricsOrder);
-      setShuffledLyrics(newShuffledLyrics);
-
-      // get list of all artists
-      const uniqueArtists = getUniqueValues(FrankLyrics, 'artistName');
-      setAllArtists(uniqueArtists);
-    }
+    promptCustom();
   }, []);
 
 
@@ -209,6 +235,7 @@ const App = () => {
             return (
               <Home
                 setPage={setPage}
+                isDisabled={disablePlayButton}
               />
             );
           case 'game':

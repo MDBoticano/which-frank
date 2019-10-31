@@ -4,10 +4,10 @@ import axios from 'axios';
  * CORS PROXY -- we need this to enable cross-origin resources
  */
 // public proxy, has limits of 200/hr
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"; 
+// const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"; 
 
 // self-hosted (ran locally) -- clone github.com/Rob--W/cors-anywhere
-// const CORS_PROXY = "http://localhost:8080/"; 
+const CORS_PROXY = "http://localhost:8080/"; 
 
 const API = "https://api.musixmatch.com/ws/1.1/";
 
@@ -18,7 +18,7 @@ const getArtists = async (name, number, API_KEY) => {
   const requestURL = `${CORS_PROXY}${API}${QUERY}${API_KEY}`;
   
   const result = await axios.get(requestURL);
-  // console.log('getArtists -- axios.get result:', result);
+  console.log('getArtists -- axios.get result:', result);
 
   const responseBody = result.data.message.body;
   return responseBody;
@@ -235,6 +235,7 @@ export const makeCustomLyrics = async (customArtistsList, customNumTracks, API_K
 
     /* Step 1: get the artist's details */
     const artists = await getArtists(customArtistName, numArtists, API_KEY);
+    console.log('artists', artists);
     const parsedArtists = parseArtistsDetails(artists);
     const initialLyricsList = initializeAllLyrics(parsedArtists, customNumTracks);
 
@@ -249,5 +250,6 @@ export const makeCustomLyrics = async (customArtistsList, customNumTracks, API_K
 
     customLyrics = [...customLyrics, ...filteredAllLyrics];
   }
+  console.log(customLyrics);
   return customLyrics;
 }
