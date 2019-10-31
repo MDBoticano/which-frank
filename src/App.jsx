@@ -189,14 +189,9 @@ const App = () => {
     const promptCustom = async () => {
       setDisablePlayButton(true);
       if (window.confirm("query")) {
-        const asyncMake = async () => {
-          const customLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
-          console.log(customLyrics);
-          return customLyrics;
-        }
-        FrankLyrics = await asyncMake();
+        FrankLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
       } else {
-        FrankLyrics = JSONLyrics.FrankLyrics;
+        FrankLyrics = JSONLyrics.FrankLyrics; // local hard-coded lyrics
       }
      
       const lyricsLength = FrankLyrics.length;
