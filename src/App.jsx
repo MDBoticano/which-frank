@@ -13,9 +13,6 @@ import {
   getUniqueValues, shuffleIndices, reorderArray, sumReducer,
 } from './utilities/helperFuncs';
 
-const api_key = process.env.REACT_APP_MUSIXMATCH_API_KEY;
-const API_KEY = `&apikey=${api_key}`;
-
 /* ------------------------------- Components ------------------------------- */
 /* Eventually, these components will become their own set of components */
 
@@ -39,7 +36,8 @@ const Home = (props) => {
   } else {
     return (
       <div className="Home">
-      <button type="button" onClick={() => props.setPage('game')} >
+      {/* <button type="button" onClick={() => props.setPage('game')} > */}
+      <button type="button" onClick={() => props.setPage('APIKeyForm')} >
         {'Let\'s Play!'}
       </button>
     </div>)
@@ -159,6 +157,61 @@ Score.propTypes = {
   reshuffleLyrics: PropTypes.func.isRequired,
 };
 /* -------- End Page: Score -------- */
+
+/* page: API KEY FORM */
+const APIKeyForm = (props) => {
+  const [formKeyValue, setFormKeyValue] = useState('');
+  const [showPlayOnline, setShowPlayOnline] = useState(false);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    props.setAPI_KEY(formKeyValue);
+    setFormKeyValue('');
+    setShowPlayOnline(true);
+  }
+
+  const handleChange = (event) => {
+    setFormKeyValue(event.target.value);
+  }
+
+  const displayPlayOnlineButton = (bool) => {
+    if (bool) {
+      return (
+        <button type="button" onClick={() => props.setPage('game')} disabled>
+          loading data from API...
+        </button>
+      )
+    } else {
+      return (
+        <button type="button" onClick={() => props.setPage('game')}>
+          Play Online
+        </button>
+      )
+    }
+  }
+
+  return (
+    <div className="APIKeyForm">
+      <form onSubmit={handleSubmit}>
+        <label>
+          musixmatch developer API Key
+          <input type="text" value={formKeyValue} onChange={handleChange} />
+          <input type="submit" value="Set Key" />
+        </label>
+      </form>
+      <button type="button" onClick={()=> props.setPage('game')}>
+        Play Offline
+      </button>
+      {showPlayOnline && displayPlayOnlineButton(props.disablePlayButton)}
+    </div>
+  )
+}
+
+
+
+/* end page: API KEY FORM */
+
 /* ------------------ End Pages ------------------ */
 /* ----------------------------- End Components ----------------------------- */
 
@@ -171,6 +224,15 @@ const App = () => {
   const [allArtists, setAllArtists] = useState([]);
   const [score, setScore] = useState([]);
   const [disablePlayButton, setDisablePlayButton] = useState(false);
+  const [API_KEY, setAPI_KEY] = useState(null)
+
+
+  // const api_key = process.env.REACT_APP_MUSIXMATCH_API_KEY;
+  // const API_KEY = `&apikey=${api_key}`;
+
+  const formatAPI_KEY = (value) => {
+    setAPI_KEY(`&apikey=${value}`);
+  }
 
   /* helpers */
   const reshuffleLyrics = () => {
@@ -179,14 +241,18 @@ const App = () => {
     setShuffledLyrics(newShuffledLyrics);
   };
 
+  const useLocalLyrics = () => {
+    return 
+  }
+
   /* load lyrics from 'backend' */
   useEffect(() => {
-
     let FrankLyrics = [];
 
     const promptCustom = async () => {
       setDisablePlayButton(true);
-      if (window.confirm("query")) {
+      if (API_KEY) {
+        console.log('using online lyrics');
         FrankLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
       } else {
         FrankLyrics = JSONLyrics.FrankLyrics; // local hard-coded lyrics
@@ -210,7 +276,7 @@ const App = () => {
     }
 
     promptCustom();
-  }, []);
+  }, [API_KEY]);
 
 
   return (
@@ -231,6 +297,14 @@ const App = () => {
                 isDisabled={disablePlayButton}
               />
             );
+          case 'APIKeyForm':
+              return (
+                <APIKeyForm
+                  setAPI_KEY={formatAPI_KEY}
+                  setPage={setPage}
+                  disablePlayButton={disablePlayButton}
+                />
+              )
           case 'game':
             return (
               <Game
