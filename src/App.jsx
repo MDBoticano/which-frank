@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-/* data imported, since no backend */
+/* hard-coded lyrics for when not using API */
 import * as JSONLyrics from './data/FrankLyrics' ;
 // import FrankLyrics from './data/ShortLyrics'; // 2 lyrics: 1 Sinatra, 1 Ocean
 
-
 /* for lyrics API testing */
-// import LyricsAPI from './lyrics-api/LyricsAPI';
 import { makeCustomLyrics } from './utilities/musixmatchAPIFuncs';
 
 /* Helper functions */
