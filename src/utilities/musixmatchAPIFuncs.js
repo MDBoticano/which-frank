@@ -175,7 +175,7 @@ let lyricsList = [...lyrics];
 const removeNoLyrics = false; // True: remove null, False: use track name as title
 const removeExplicit = true;
 const removeNonEnglish = true;
-const removeAliasMatches = true;
+const removeAliasMatches = false;
 
 if (removeAliasMatches) { 
   const noAliasMatches = lyricsList.filter(lyric => 

@@ -228,11 +228,7 @@ const App = () => {
   const [allArtists, setAllArtists] = useState([]);
   const [score, setScore] = useState([]);
   const [disablePlayButton, setDisablePlayButton] = useState(false);
-  const [API_KEY, setAPI_KEY] = useState(null)
-
-
-  // const api_key = process.env.REACT_APP_MUSIXMATCH_API_KEY;
-  // const API_KEY = `&apikey=${api_key}`;
+  const [API_KEY, setAPI_KEY] = useState(null);
 
   const formatAPI_KEY = (value) => {
     setAPI_KEY(`&apikey=${value}`);
@@ -254,6 +250,9 @@ const App = () => {
       if (API_KEY) {
         console.log('using online lyrics');
         FrankLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
+        // FrankLyrics = await makeCustomLyrics(['21 Savage', 'twenty one pilots'], 10, API_KEY );
+        // FrankLyrics = await makeCustomLyrics(['Panic at the Disco', 'Coldplay'], 5, API_KEY );
+        // FrankLyrics = await makeCustomLyrics(['ASAP Rocky', 'Travis Scott'], 5, API_KEY );
         // Fallback if API key fails
         if (FrankLyrics.length === 0) {
           FrankLyrics = JSONLyrics.FrankLyrics;
