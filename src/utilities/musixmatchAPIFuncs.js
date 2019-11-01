@@ -214,7 +214,6 @@ if (removeAliasMatches) {
 }
 
 
-    
 /**
  * @param {*} customArtistsList - array of artist string names
  * @param {*} customNumTracks - # of tracks per artists
@@ -230,26 +229,31 @@ export const makeCustomLyrics = async (customArtistsList, customNumTracks, API_K
   } else {
     numArtists = 1;
   }
-  for (let i = 0; i <customArtistsList.length; i++ ){
-    const customArtistName = customArtistsList[i];
+  try {
+    for (let i = 0; i <customArtistsList.length; i++ ){
+      const customArtistName = customArtistsList[i];
 
-    /* Step 1: get the artist's details */
-    const artists = await getArtists(customArtistName, numArtists, API_KEY);
-    console.log('artists', artists);
-    const parsedArtists = parseArtistsDetails(artists);
-    const initialLyricsList = initializeAllLyrics(parsedArtists, customNumTracks);
+      /* Step 1: get the artist's details */
+      const artists = await getArtists(customArtistName, numArtists, API_KEY);
+      console.log('artists', artists);
+      const parsedArtists = parseArtistsDetails(artists);
+      const initialLyricsList = initializeAllLyrics(parsedArtists, customNumTracks);
 
-    /* Step 2: get top tracks per artist */
-    const allTopTracks = await getAllTopTracks(parsedArtists, customNumTracks, API_KEY);
-    const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
+      /* Step 2: get top tracks per artist */
+      const allTopTracks = await getAllTopTracks(parsedArtists, customNumTracks, API_KEY);
+      const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
 
-    /* Step 3: get snippets for each track */
-    const topTrackSnippets = await getAllTrackSnippets(allTopTracks, API_KEY);
-    const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
-    const filteredAllLyrics = filterAllLyrics(completedAllLyrics, 'Frank');
+      /* Step 3: get snippets for each track */
+      const topTrackSnippets = await getAllTrackSnippets(allTopTracks, API_KEY);
+      const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
+      const filteredAllLyrics = filterAllLyrics(completedAllLyrics, 'Frank');
 
-    customLyrics = [...customLyrics, ...filteredAllLyrics];
+      customLyrics = [...customLyrics, ...filteredAllLyrics];
+    }
+    console.log(customLyrics);
+    return customLyrics;
+  } catch (e) {
+    console.log(`error fetching data from Musixmatch \n`, e);
+    return [];
   }
-  console.log(customLyrics);
-  return customLyrics;
 }

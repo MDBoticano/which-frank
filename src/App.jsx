@@ -160,6 +160,7 @@ Score.propTypes = {
 
 /* page: API KEY FORM */
 const APIKeyForm = (props) => {
+  const [displayForm, setDisplayForm] = useState(true);
   const [formKeyValue, setFormKeyValue] = useState('');
   const [showPlayOnline, setShowPlayOnline] = useState(false);
 
@@ -168,6 +169,7 @@ const APIKeyForm = (props) => {
 
     props.setAPI_KEY(formKeyValue);
     setFormKeyValue('');
+    setDisplayForm(false);
     setShowPlayOnline(true);
   }
 
@@ -185,7 +187,7 @@ const APIKeyForm = (props) => {
     } else {
       return (
         <button type="button" onClick={() => props.setPage('game')}>
-          Play Online
+          Play with online lyrics
         </button>
       )
     }
@@ -193,13 +195,15 @@ const APIKeyForm = (props) => {
 
   return (
     <div className="APIKeyForm">
-      <form onSubmit={handleSubmit}>
+      {displayForm &&
+        <form onSubmit={handleSubmit}>
         <label>
           musixmatch developer API Key
           <input type="text" value={formKeyValue} onChange={handleChange} />
           <input type="submit" value="Set Key" />
         </label>
-      </form>
+        </form>
+      }      
       <button type="button" onClick={()=> props.setPage('game')}>
         Play Offline
       </button>
@@ -241,10 +245,6 @@ const App = () => {
     setShuffledLyrics(newShuffledLyrics);
   };
 
-  const useLocalLyrics = () => {
-    return 
-  }
-
   /* load lyrics from 'backend' */
   useEffect(() => {
     let FrankLyrics = [];
@@ -254,6 +254,10 @@ const App = () => {
       if (API_KEY) {
         console.log('using online lyrics');
         FrankLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
+        // Fallback if API key fails
+        if (FrankLyrics.length === 0) {
+          FrankLyrics = JSONLyrics.FrankLyrics;
+        } 
       } else {
         FrankLyrics = JSONLyrics.FrankLyrics; // local hard-coded lyrics
       }
