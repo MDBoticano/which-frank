@@ -177,6 +177,14 @@ const APIKeyForm = (props) => {
     setFormKeyValue(event.target.value);
   }
 
+  const displayActiveArtists = (artistList) => {
+    return (
+      <div>
+        {artistList[0]} vs {artistList[1]}
+      </div>
+    )
+  }
+
   const displayPlayOnlineButton = (bool) => {
     if (bool) {
       return (
@@ -187,23 +195,27 @@ const APIKeyForm = (props) => {
     } else {
       return (
         <button type="button" onClick={() => props.setPage('game')}>
-          Play with online lyrics
+          Play with Musixmatch lyrics
         </button>
       )
     }
   }
 
+  const setAsActiveArtists = (artistList) => {
+    props.setArtistsQuery(artistList);
+  }
+
   const displayPotentialQueries = (bool) => {
-    if (bool) {
+    if (bool && !displayForm) {
       return (
         <div className="artistQueries">
-          <button onClick={() => props.setArtistsQuery(['Frank Ocean', 'Frank Sinatra'])}>
+          <button onClick={() => setAsActiveArtists(['Frank Ocean', 'Frank Sinatra'])}>
             Frank Ocean vs Frank Sinatra
           </button>
-          <button onClick={() => props.setArtistsQuery(['21 Savage', 'Twenty One Pilots'])}>
+          <button onClick={() => setAsActiveArtists(['21 Savage', 'Twenty One Pilots'])}>
             21 Savage vs Twenty One Pilots
           </button>
-          <button onClick={() => props.setArtistsQuery(['ASAP Rocky', 'Travis Scott'])}>
+          <button onClick={() => setAsActiveArtists(['ASAP Rocky', 'Travis Scott'])}>
             A$AP Rocky vs Travis Scott
           </button>
         </div>
@@ -221,12 +233,13 @@ const APIKeyForm = (props) => {
           <input type="submit" value="Set Key" />
         </label>
         </form>
-      }      
-      <button type="button" onClick={()=> props.setPage('game')}>
-        Play Offline
-      </button>
-      {showPlayOnline && displayPlayOnlineButton(props.disablePlayButton)}
+      }
       {displayPotentialQueries(props.displayQueries)}
+      {props.artistsQuery && displayActiveArtists(props.artistsQuery)}
+      {showPlayOnline && displayPlayOnlineButton(props.disablePlayButton)}
+      <button type="button" onClick={()=> props.setPage('game')}>
+        Play with default lyrics
+      </button>
     </div>
   )
 }
@@ -247,7 +260,7 @@ const App = () => {
   const [score, setScore] = useState([]);
   const [disablePlayButton, setDisablePlayButton] = useState(false);
   const [notification, setNotification] = useState('');
-  const [artistsQuery, setArtistsQuery] = useState(['Frank_Sinatra', 'Frank Ocean']);
+  const [artistsQuery, setArtistsQuery] = useState(['Frank Sinatra', 'Frank Ocean']);
   const [displayQueries, setDisplayQueries] = useState(false);
   const [API_KEY, setAPI_KEY] = useState(null);
 
@@ -271,10 +284,7 @@ const App = () => {
       if (API_KEY) {
         setDisplayQueries(true);
         console.log('using online lyrics');
-        FrankLyrics = await makeCustomLyrics(artistsQuery, 1, API_KEY );
-        // FrankLyrics = await makeCustomLyrics(['21 Savage', 'twenty one pilots'], 10, API_KEY );
-        // FrankLyrics = await makeCustomLyrics(['Panic at the Disco', 'Coldplay'], 5, API_KEY );
-        // FrankLyrics = await makeCustomLyrics(['ASAP Rocky', 'Travis Scott'], 5, API_KEY );
+        FrankLyrics = await makeCustomLyrics(artistsQuery, 5, API_KEY );
         // Fallback if API key fails
         if (FrankLyrics.length === 0) {
           setNotification('Failed to retireve data from Musixmatch. Using local lyrics instead.');
@@ -333,6 +343,7 @@ const App = () => {
                   setPage={setPage}
                   setArtistsQuery={setArtistsQuery}
                   disablePlayButton={disablePlayButton}
+                  artistsQuery={artistsQuery}
                   displayQueries={displayQueries}
                 />
               )
