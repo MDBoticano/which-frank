@@ -193,6 +193,24 @@ const APIKeyForm = (props) => {
     }
   }
 
+  const displayPotentialQueries = (bool) => {
+    if (bool) {
+      return (
+        <div className="artistQueries">
+          <button onClick={() => props.setArtistsQuery(['Frank Ocean', 'Frank Sinatra'])}>
+            Frank Ocean vs Frank Sinatra
+          </button>
+          <button onClick={() => props.setArtistsQuery(['21 Savage', 'Twenty One Pilots'])}>
+            21 Savage vs Twenty One Pilots
+          </button>
+          <button onClick={() => props.setArtistsQuery(['ASAP Rocky', 'Travis Scott'])}>
+            A$AP Rocky vs Travis Scott
+          </button>
+        </div>
+      )
+    }
+  }
+
   return (
     <div className="APIKeyForm">
       {displayForm &&
@@ -208,6 +226,7 @@ const APIKeyForm = (props) => {
         Play Offline
       </button>
       {showPlayOnline && displayPlayOnlineButton(props.disablePlayButton)}
+      {displayPotentialQueries(props.displayQueries)}
     </div>
   )
 }
@@ -221,13 +240,15 @@ const APIKeyForm = (props) => {
 
 const App = () => {
   /* state */
-  // const [page, setPage] = useState('loading');
   const [page, setPage] = useState('home');
   const [allLyrics, setAllLyrics] = useState([]);
   const [shuffledLyrics, setShuffledLyrics] = useState([]);
   const [allArtists, setAllArtists] = useState([]);
   const [score, setScore] = useState([]);
   const [disablePlayButton, setDisablePlayButton] = useState(false);
+  const [notification, setNotification] = useState('');
+  const [artistsQuery, setArtistsQuery] = useState(['Frank_Sinatra', 'Frank Ocean']);
+  const [displayQueries, setDisplayQueries] = useState(false);
   const [API_KEY, setAPI_KEY] = useState(null);
 
   const formatAPI_KEY = (value) => {
@@ -248,14 +269,18 @@ const App = () => {
     const promptCustom = async () => {
       setDisablePlayButton(true);
       if (API_KEY) {
+        setDisplayQueries(true);
         console.log('using online lyrics');
-        FrankLyrics = await makeCustomLyrics(['Frank_Sinatra', 'Frank Ocean'], 1, API_KEY );
+        FrankLyrics = await makeCustomLyrics(artistsQuery, 1, API_KEY );
         // FrankLyrics = await makeCustomLyrics(['21 Savage', 'twenty one pilots'], 10, API_KEY );
         // FrankLyrics = await makeCustomLyrics(['Panic at the Disco', 'Coldplay'], 5, API_KEY );
         // FrankLyrics = await makeCustomLyrics(['ASAP Rocky', 'Travis Scott'], 5, API_KEY );
         // Fallback if API key fails
         if (FrankLyrics.length === 0) {
+          setNotification('Failed to retireve data from Musixmatch. Using local lyrics instead.');
+          setTimeout( () => setNotification(''), 5000);
           FrankLyrics = JSONLyrics.FrankLyrics;
+          return;
         } 
       } else {
         FrankLyrics = JSONLyrics.FrankLyrics; // local hard-coded lyrics
@@ -279,12 +304,13 @@ const App = () => {
     }
 
     promptCustom();
-  }, [API_KEY]);
+  }, [API_KEY, artistsQuery]);
 
 
   return (
     <div className="App">
       <p>{page}</p>
+      <p>{notification}</p>
       {(() => {
         switch (page) {
           case 'loading':
@@ -305,7 +331,9 @@ const App = () => {
                 <APIKeyForm
                   setAPI_KEY={formatAPI_KEY}
                   setPage={setPage}
+                  setArtistsQuery={setArtistsQuery}
                   disablePlayButton={disablePlayButton}
+                  displayQueries={displayQueries}
                 />
               )
           case 'game':
