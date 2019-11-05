@@ -205,8 +205,8 @@ const APIKeyForm = (props) => {
     props.setArtistsQuery(artistList);
   }
 
-  const displayPotentialQueries = (bool) => {
-    if (bool && !displayForm) {
+  const displayPotentialQueries = (displayQueryButtons, disableQueryButtons = false) => {
+    if (displayQueryButtons && !disableQueryButtons && !displayForm) {
       return (
         <div className="artistQueries">
           <button onClick={() => setAsActiveArtists(['Frank Ocean', 'Frank Sinatra'])}>
@@ -219,6 +219,27 @@ const APIKeyForm = (props) => {
             A$AP Rocky vs Travis Scott
           </button>
         </div>
+      )
+    }
+    else if (disableQueryButtons && disableQueryButtons && !displayForm) {
+      return (
+        <div className="artistQueries">
+        <button disabled 
+          onClick={() => setAsActiveArtists(['Frank Ocean', 'Frank Sinatra'])}
+        >
+          Frank Ocean vs Frank Sinatra
+        </button>
+        <button disabled
+          onClick={() => setAsActiveArtists(['21 Savage', 'Twenty One Pilots'])}
+        >
+          21 Savage vs Twenty One Pilots
+        </button>
+        <button disabled
+          onClick={() => setAsActiveArtists(['ASAP Rocky', 'Travis Scott'])}
+        >
+          A$AP Rocky vs Travis Scott
+        </button>
+      </div>
       )
     }
   }
@@ -234,7 +255,7 @@ const APIKeyForm = (props) => {
         </label>
         </form>
       }
-      {displayPotentialQueries(props.displayQueries)}
+      {displayPotentialQueries(props.displayQueries, props.disablePlayButton)}
       {props.artistsQuery && displayActiveArtists(props.artistsQuery)}
       {showPlayOnline && displayPlayOnlineButton(props.disablePlayButton)}
       <button type="button" onClick={()=> props.setPage('game')}>
