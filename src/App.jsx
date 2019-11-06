@@ -134,6 +134,7 @@ const Score = (props) => {
     props.setPage(page);
     props.setScore([]);
     props.reshuffleLyrics();
+    props.setDisablePlayButton(false);
   };
   /* --- End Helpers: Score --- */
 
@@ -384,6 +385,7 @@ const App = () => {
                 setPage={setPage}
                 score={score}
                 setScore={setScore}
+                setDisablePlayButton={setDisablePlayButton}
                 reshuffleLyrics={reshuffleLyrics}
               />
             );
