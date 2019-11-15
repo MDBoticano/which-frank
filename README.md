@@ -1,14 +1,14 @@
-# Which Frank? 
-How well do you know musicians named Frank? Find out with this guessing game.
+# [Which Frank?](https://mdboticano.github.io/which-frank)
+How well do you know musicians named Frank? Find out with this guessing game made with React.
 
-Play the game [here](https://mdboticano.github.io/which-frank).
+Play the game [here]
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
 
 ## Releases
 ### 2.0.1
-- Changed CORS proxy to use live example of CORS-Anywhere. Considering hosting own instance.
-- Fixed bug that kept the play disabled if the user entered and invalid API key. 
+- Changed CORS proxy to use live example of CORS-Anywhere.
+- Fixed bug that kept the play disabled if the user entered an invalid API key. 
 
 ### 2.0.0
 - Added ability to fetch lyrics from Musixmatch API. For now, the API key is accepted from within the UI. 
