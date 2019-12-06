@@ -1,6 +1,5 @@
 {
   "name": "which-frank",
-  "homepage": "https://mdboticano.github.io/which-frank",
   "version": "1.1.0",
   "private": true,
   "dependencies": {
@@ -16,8 +15,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
     "eslint": "eslint --ext .js --ext .jsx ."
   },
   "eslintConfig": {
