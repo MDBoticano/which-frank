@@ -165,6 +165,15 @@ const APIKeyForm = (props) => {
   const [formKeyValue, setFormKeyValue] = useState('');
   const [showPlayOnline, setShowPlayOnline] = useState(false);
 
+
+  /* instead of prompting use for API key, just use env variables */
+  useEffect(() => {
+    const env_key = process.env.REACT_APP_MUSIXMATCH_API_KEY;
+    props.setAPI_KEY(env_key);
+    setDisplayForm(false);
+    setShowPlayOnline(true);
+  }, [props]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
