@@ -12,6 +12,7 @@ const Game = () => {
       GAME
 
       score: {dataContext.score}
+      data type: {dataContext.dataType}
 
       <button onClick={() => {dataContext.setScore(dataContext.score + 1)}}>
         Correct Answer

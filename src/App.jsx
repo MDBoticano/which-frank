@@ -18,8 +18,15 @@ const App = () => {
   const [API_KEY] = useState();
   const [score, setScore] = useState(0);
 
+  const initialContext = {
+    dataType: 'local',
+    API_KEY: API_KEY,
+    score: score,
+    setScore: setScore,
+  }
+
   return (
-    <DataContextProvider value={{ API_KEY: API_KEY, score: score, setScore: setScore }} >
+    <DataContextProvider value={initialContext} >
       <div className="app">
         <Router>
           <Route exact path="/" render={() => <Home />} />

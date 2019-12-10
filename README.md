@@ -1,4 +1,4 @@
-# [Which Frank?](https://mdboticano.github.io/which-frank)
+# Which Frank?
 How well do you know musicians named Frank? Find out with this guessing game made with React.
 
 ## Work in Progress
@@ -6,8 +6,8 @@ How well do you know musicians named Frank? Find out with this guessing game mad
 This will move the app hosting from GitHub pages to Netlify. Moving the app to Netlify enables "hiding" the API key in environment variables. As the app makes the requests to the API itself, the user will still be able to see the post-fixed API key.
 
 #### Issues to fix/Goals
-- [ ] Remove `<APIKeyForm />` due to key now being in env variables
-- [ ] Simplify flow and routing with react-router (compatible with Netlify, not with GH Pages)
+- [X] Remove `<APIKeyForm />` due to key now being in env variables
+- [X] Simplify flow and routing with react-router (compatible with Netlify, not with GH Pages)
 - [ ] Decrease snippet retreival speed (create a benchmark?)
 - [ ] Improve track search to remove remixes/remasters of the same songs
 - [ ] Improve UI
