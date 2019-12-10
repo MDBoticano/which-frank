@@ -7,12 +7,12 @@ import DataContext from '../DataContext';
 const Game = () => {
   const dataContext = useContext(DataContext);
 
-  const toggleDataType = () => {
-    if (dataContext.dataType === 'local') {
-      dataContext.setDataType('API');
+  const toggleDataOrigin = () => {
+    if (dataContext.dataOrigin === 'local') {
+      dataContext.setDataOrigin('API');
     }
-    else if (dataContext.dataType === 'API'){
-      dataContext.setDataType('local');
+    else if (dataContext.dataOrigin === 'API'){
+      dataContext.setDataOrigin('local');
     }
   }
 
@@ -22,8 +22,8 @@ const Game = () => {
 
       score: {dataContext.score}
 
-      <button onClick={() => toggleDataType()}>
-        data type: {dataContext.dataType}
+      <button onClick={() => toggleDataOrigin()}>
+        data dataOrigin: {dataContext.dataOrigin}
       </button>
 
       <button onClick={() => {dataContext.setScore(dataContext.score + 1)}}>

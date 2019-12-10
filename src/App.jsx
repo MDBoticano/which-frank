@@ -23,7 +23,7 @@ const App = () => {
   const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
 
   const [score, setScore] = useState(0);
-  const [dataType, setDataType] = useState('local');
+  const [dataOrigin, setDataOrigin] = useState('local');
   const [artists, setArtists] = useState(['Frank Ocean', 'Frank Sinatra']);
   const [snippets, setSnippets] = useState([]);
   const [numSongs] = useState(1);
@@ -41,21 +41,21 @@ const App = () => {
       /* Without an API key, only local lyrics are available */
       if (!API_KEY) {
         console.log('getAPISnippets: No API KEY!');
-        if (dataType !== 'local') {
+        if (dataOrigin !== 'local') {
           console.log('getAPISnippets: Only local snippets allowed.');
-          setDataType('local');
+          setDataOrigin('local');
         }
       }
 
       /* If the data type is local (default), grab offline lyrics */
-      if (dataType === 'local') {
+      if (dataOrigin === 'local') {
         console.log('getAPISnippets: using local lyrics.');
         const apiSnippets = JSONLyrics.FrankLyrics;
         setSnippets(apiSnippets);
       }
 
       /* if there's an API key, and the game wants the API data ... */
-      else if (dataType === 'API') {
+      else if (dataOrigin === 'API') {
         console.log('getAPISnippets: requesting musixmatch snippets...');
 
         /* use helper function to retreive data */
@@ -63,8 +63,8 @@ const App = () => {
 
         // If the function fails to retrieve anything, default to local lyrics
         if (apiSnippets.length === 0) {
-          console.log('getAPISnippets: API request failed. Defaulting to local');
-          setDataType('local');
+          console.log('getAPISnippets: API request failed. Using local snippets');
+          setDataOrigin('local');
         }
 
         else {
@@ -75,11 +75,11 @@ const App = () => {
     }
 
     getAPISnippets();
-  }, [API_KEY, dataType, artists, numSongs]);
+  }, [API_KEY, dataOrigin, artists, numSongs]);
 
   const initialContext = {
-    dataType: dataType,
-    setDataType: setDataType,
+    dataOrigin: dataOrigin,
+    setDataOrigin: setDataOrigin,
     API_KEY: API_KEY,
     score: score,
     setScore: setScore,
