@@ -90,6 +90,7 @@ const App = () => {
 
   return (
     <DataContextProvider value={initialContext} >
+      {console.log('<App/> is rendered')}
       <div className="app">
         <Router>
           <Route exact path="/" render={() => <Home />} />

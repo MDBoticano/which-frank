@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 /* context */
@@ -6,6 +6,9 @@ import DataContext from '../DataContext';
 
 const Game = () => {
   const dataContext = useContext(DataContext);
+  const SCORE = dataContext.score;
+
+  const [gameScore, setGameScore] = useState(SCORE);
 
   const toggleDataOrigin = () => {
     if (dataContext.dataOrigin === 'local') {
@@ -18,15 +21,17 @@ const Game = () => {
 
   return (
     <div className="game">
+      {console.log('<Game/> is rendered')}
+
       GAME
 
-      score: {dataContext.score}
+      score: {gameScore}
 
       <button onClick={() => toggleDataOrigin()}>
-        data dataOrigin: {dataContext.dataOrigin}
+        data origin: {dataContext.dataOrigin}
       </button>
 
-      <button onClick={() => {dataContext.setScore(dataContext.score + 1)}}>
+      <button onClick={() => {setGameScore(gameScore + 1)}}>
         Correct Answer
       </button>
 
@@ -35,7 +40,7 @@ const Game = () => {
       </button>
 
       <Link to="/score">
-        <button>
+        <button onClick={() => dataContext.setScore(gameScore)}>
           View Score
         </button>
       </Link>
