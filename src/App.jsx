@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 // import PropTypes from 'prop-types';
 
@@ -14,12 +14,21 @@ import './App.scss';
 import { DataContextProvider } from './DataContext';
 
 
+
+
 const App = () => {
-  const [API_KEY] = useState();
+  const [API_KEY, setAPI_KEY] = useState(null);
   const [score, setScore] = useState(0);
+  const [dataType, setDataType] = useState('local'); // local or API/online
+
+  /* Retrieve the API key from environment variables */
+  useEffect(() => {
+    setAPI_KEY(process.env.REACT_APP_MUSIXMATCH_API_KEY);
+  }, []);
 
   const initialContext = {
-    dataType: 'local',
+    dataType: dataType,
+    setDataType: setDataType,
     API_KEY: API_KEY,
     score: score,
     setScore: setScore,
