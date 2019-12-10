@@ -222,6 +222,9 @@ if (removeAliasMatches) {
  * want to get. e.g. makeCustomlyrics()
  */
 export const makeCustomLyrics = async (customArtistsList, customNumTracks, API_KEY, customNumArtists = 1) => {
+
+  const API_ARG = `&apikey=${API_KEY}`;
+
   let customLyrics = [];
   let numArtists = -1;
   if (customArtistsList.length === 1) {
@@ -234,17 +237,17 @@ export const makeCustomLyrics = async (customArtistsList, customNumTracks, API_K
       const customArtistName = customArtistsList[i];
 
       /* Step 1: get the artist's details */
-      const artists = await getArtists(customArtistName, numArtists, API_KEY);
+      const artists = await getArtists(customArtistName, numArtists, API_ARG);
       console.log('artists', artists);
       const parsedArtists = parseArtistsDetails(artists);
       const initialLyricsList = initializeAllLyrics(parsedArtists, customNumTracks);
 
       /* Step 2: get top tracks per artist */
-      const allTopTracks = await getAllTopTracks(parsedArtists, customNumTracks, API_KEY);
+      const allTopTracks = await getAllTopTracks(parsedArtists, customNumTracks, API_ARG);
       const detailedLyricsList = addTopTracksToAllLyrics(initialLyricsList, allTopTracks);
 
       /* Step 3: get snippets for each track */
-      const topTrackSnippets = await getAllTrackSnippets(allTopTracks, API_KEY);
+      const topTrackSnippets = await getAllTrackSnippets(allTopTracks, API_ARG);
       const completedAllLyrics = addSnippetToAllLyrics(detailedLyricsList, topTrackSnippets);
       const filteredAllLyrics = filterAllLyrics(completedAllLyrics, 'Frank');
 
