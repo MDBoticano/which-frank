@@ -11,6 +11,7 @@ const Home = () => {
   const artists = dataContext.artists;
   const numArtists = artists.length;
   const setArtists = dataContext.setArtists;
+  const enablePlay = dataContext.enablePlay;
 
   const artistPairings = [
     ['Frank Ocean', 'Frank Sinatra'],
@@ -67,6 +68,22 @@ const Home = () => {
     return (<ul className="pairing-options__list">{pairButtons}</ul>);
   }
 
+  const showPlay = (enabled) => {
+    if (enabled) {
+      return (
+        <Link to="/game">
+          <button>
+            {createButtonLabel(artists)}
+          </button>
+        </Link>
+      );
+    } else {
+      return (
+        <div>loading...</div>
+      );
+    }
+  }
+
   return (
     <div className="home">
     {console.log('<Home/> is rendered')}
@@ -81,12 +98,7 @@ const Home = () => {
       {createPairings(artistPairings)}
 
       <h2>Play</h2>
-
-      <Link to="/game">
-        <button>
-          {createButtonLabel(artists)}
-        </button>
-      </Link>
+      {showPlay(enablePlay)}
     </div>
   );
 }
