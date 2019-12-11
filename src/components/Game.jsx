@@ -10,15 +10,6 @@ const Game = () => {
 
   const [gameScore, setGameScore] = useState(SCORE);
 
-  const toggleDataOrigin = () => {
-    if (dataContext.dataOrigin === 'local') {
-      dataContext.setDataOrigin('API');
-    }
-    else if (dataContext.dataOrigin === 'API'){
-      dataContext.setDataOrigin('local');
-    }
-  }
-
   return (
     <div className="game">
       {console.log('<Game/> is rendered')}
@@ -26,10 +17,6 @@ const Game = () => {
       GAME
 
       score: {gameScore}
-
-      <button onClick={() => toggleDataOrigin()}>
-        data origin: {dataContext.dataOrigin}
-      </button>
 
       <button onClick={() => {setGameScore(gameScore + 1)}}>
         Correct Answer

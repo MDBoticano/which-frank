@@ -3,6 +3,10 @@
   padding: 0;
 }
 
+@mixin no-list-style {
+  list-style: none;
+}
+
 body {
   @include reset-box;
 }
@@ -10,9 +14,16 @@ body {
 .app {
   @include reset-box;
 
+  padding: 2em;
+
 
   min-height: 100vh;
 
   background-color: rgb(255, 218, 196);
 
+}
+
+.pairing-options__list {
+  @include reset-box;
+  @include no-list-style;
 }
