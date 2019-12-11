@@ -1,16 +1,19 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 /* context */
 import DataContext from '../DataContext';
 
 /* utilities */
-import { getUniqueValues } from '../utilities/helperFuncs';
+import { getUniqueValues, getOrderedIndices, shuffleIndices, 
+} from '../utilities/helperFuncs';
 
 const Game = () => {
   const dataContext = useContext(DataContext);
   const snippets = dataContext.snippets;
   const numSnippets = snippets.length;
+  const defaultOrder = getOrderedIndices(numSnippets);
+
   /* Instead of using context artist values, use artist names frm snippets
    * This is because the query may not match the spelling used in the API
    */ 
@@ -18,9 +21,17 @@ const Game = () => {
 
   const [gameScore, setGameScore] = useState(0);
   const [snipIndex, setSnipIndex] = useState(0);
+  const [snipOrder, setSnipOrder] = useState(defaultOrder);
+
+  useEffect(() => {
+    console.log('<Game />: creating snippet order');
+    const newOrder = shuffleIndices(numSnippets);
+    console.log('<Game />: new order --', newOrder);
+    setSnipOrder(newOrder);
+  }, [snippets, numSnippets]);
 
   const submitGuess = (guess) => {
-    const currentArtist = snippets[snipIndex].artist_name;
+    const currentArtist = snippets[snipOrder[snipIndex]].artist_name;
     if (guess === currentArtist) {
       setGameScore(gameScore + 1);
     }
@@ -37,7 +48,6 @@ const Game = () => {
     });
     return buttons;
   }
-
 
   const displaySnippet = (snip) => {
     return (
@@ -68,8 +78,11 @@ const Game = () => {
       <h1>GAME</h1>
       <h4>score: {gameScore}</h4>
 
-      {snipIndex < numSnippets && displaySnippet(snippets[snipIndex])}
-      {snipIndex >= numSnippets && displayScorePrompt()}
+      {
+        snipIndex < numSnippets ? 
+        displaySnippet(snippets[snipOrder[snipIndex]]) :
+        displayScorePrompt()
+      }
     </div>
   );
 }
