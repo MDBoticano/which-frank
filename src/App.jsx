@@ -25,8 +25,8 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [dataOrigin, setDataOrigin] = useState('local');
   const [artists, setArtists] = useState(['Frank Ocean', 'Frank Sinatra']);
-  const [snippets, setSnippets] = useState([]);
-  const [numSongs] = useState(1);
+  const [snippets, setSnippets] = useState(JSONLyrics.FrankLyrics);
+  const [numSongs] = useState(5); // possible setting, hence state
   const [enablePlay, setEnablePlay] = useState(true);
 
 

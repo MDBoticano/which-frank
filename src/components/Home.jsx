@@ -16,7 +16,8 @@ const Home = () => {
   const artistPairings = [
     ['Frank Ocean', 'Frank Sinatra'],
     ['21 Savage', 'twenty one pilots'],
-    ['A$AP Rocky', 'Travis Scott'],
+    ['Jack White', 'Jack Black'],
+    ['John Lennon', 'John Legend'],
   ];
 
   const toggleDataOrigin = () => {

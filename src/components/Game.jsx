@@ -5,12 +5,15 @@ import { Link } from 'react-router-dom';
 import DataContext from '../DataContext';
 
 /* utilities */
-import { getUniqueValues, shuffleIndices} from '../utilities/helperFuncs';
+import { getUniqueValues, getOrderedIndices, shuffleIndices, 
+} from '../utilities/helperFuncs';
 
 const Game = () => {
   const dataContext = useContext(DataContext);
   const snippets = dataContext.snippets;
   const numSnippets = snippets.length;
+  const defaultOrder = getOrderedIndices(numSnippets);
+
   /* Instead of using context artist values, use artist names frm snippets
    * This is because the query may not match the spelling used in the API
    */ 
@@ -18,13 +21,12 @@ const Game = () => {
 
   const [gameScore, setGameScore] = useState(0);
   const [snipIndex, setSnipIndex] = useState(0);
-  const [snipOrder, setSnipOrder] = useState([]);
+  const [snipOrder, setSnipOrder] = useState(defaultOrder);
 
   useEffect(() => {
     console.log('<Game />: creating snippet order');
     const newOrder = shuffleIndices(numSnippets);
     console.log('<Game />: new order --', newOrder);
-
     setSnipOrder(newOrder);
   }, [snippets, numSnippets]);
 
@@ -76,11 +78,11 @@ const Game = () => {
       <h1>GAME</h1>
       <h4>score: {gameScore}</h4>
 
-      { 
-        snipIndex < numSnippets && snipOrder.length > 0 &&
-        displaySnippet(snippets[snipOrder[snipIndex]])
+      {
+        snipIndex < numSnippets ? 
+        displaySnippet(snippets[snipOrder[snipIndex]]) :
+        displayScorePrompt()
       }
-      {snipIndex >= numSnippets && displayScorePrompt()}
     </div>
   );
 }
