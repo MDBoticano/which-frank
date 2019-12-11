@@ -101,3 +101,14 @@ export const reorderArray = (originalArray, newOrder) => {
 /**
  * TODO: combine all of the above shuffling steps into one function
  */
+export const shuffleArray = (originalArray) => {
+  let shuffledArray = [];
+
+  // Step 1: Generate a new order
+  const newOrder = shuffleIndices(originalArray.length);
+
+  // Step 2: Create a shuffled-order array
+  shuffledArray = reorderArray(originalArray, newOrder);
+
+  return shuffledArray;
+}
