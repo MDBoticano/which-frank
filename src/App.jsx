@@ -27,8 +27,7 @@ const App = () => {
   const [artists, setArtists] = useState(['Frank Ocean', 'Frank Sinatra']);
   const [snippets, setSnippets] = useState([]);
   const [numSongs] = useState(1);
-
-
+  const [enablePlay, setEnablePlay] = useState(true);
 
 
   /* Retrieve music from the API */
@@ -59,6 +58,7 @@ const App = () => {
         console.log('getAPISnippets: requesting musixmatch snippets...');
 
         /* use helper function to retreive data */
+        setEnablePlay(false);
         const apiSnippets = await makeCustomLyrics(artists, numSongs, API_KEY);
 
         // If the function fails to retrieve anything, default to local lyrics
@@ -71,11 +71,12 @@ const App = () => {
           console.log('getAPISnippets: API request success.');
           setSnippets(apiSnippets);
         }
+        setEnablePlay(true);
       }
     }
 
     getAPISnippets();
-  }, [API_KEY, dataOrigin, artists, numSongs]);
+  }, [API_KEY, dataOrigin, artists, numSongs, setEnablePlay]);
 
   const initialContext = {
     dataOrigin: dataOrigin,
@@ -86,6 +87,7 @@ const App = () => {
     artists: artists,
     setArtists: setArtists,
     snippets: snippets,
+    enablePlay: enablePlay,
   }
 
   return (
