@@ -1,3 +1,6 @@
+// @import url('https://fonts.googleapis.com/css?family=Permanent+Marker&display=swap');
+// @import url('https://fonts.googleapis.com/css?family=Caveat+Brush&display=swap');
+
 @mixin reset-box {
   margin: 0;
   padding: 0;
@@ -7,23 +10,129 @@
   list-style: none;
 }
 
+@mixin primary-font {
+  font-family: 'Caveat Brush', Arial, Helvetica, sans-serif;
+}
+
+:root {
+  --app-max-width: 840px;
+}
+
 body {
   @include reset-box;
+  @include primary-font;
+
+  color: rgb(212, 212, 212);
+
+  background-color: hsl(234, 50%, 16%);
 }
 
 .app {
   @include reset-box;
+  box-sizing: border-box;
 
-  padding: 2em;
-
-
+  max-width: var(--app-max-width);
   min-height: 100vh;
 
-  background-color: rgb(255, 218, 196);
+  margin-left: auto;
+  margin-right: auto;
 
+  background-color: hsl(234, 50%, 16%);
 }
 
-.pairing-options__list {
-  @include reset-box;
-  @include no-list-style;
+
+/* home */
+.home {
+  width: 100%;
+
+  padding-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  border: solid 1px white;
+
+  &--title {
+    @include reset-box;
+    font-size: 3rem;
+  }
+}
+
+.pairs-list {
+  border: solid 1px white;
+  padding: 1rem;
+
+  &__title {
+    @include reset-box;
+  
+    text-align: center;
+    font-size: 1.25rem;
+  }
+
+  &__list {
+    @include reset-box;
+    @include no-list-style;
+  }
+
+  &__option {
+    @include primary-font;
+    font-size: 1.25rem;
+  
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+  
+    width: 100%;
+  
+    border-radius: 0.5rem;
+  }
+}
+
+.play-game {
+  &__prompt {
+    @include reset-box;
+
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  &__instruction {
+    @include reset-box;
+  }
+
+  &__lyrics-source {
+    @include reset-box;
+  }
+
+  &__active-artists {
+    @include reset-box;
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  &__link {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+
+    text-decoration: none;
+
+    &-button {  
+      @include primary-font;
+      
+      margin: 1rem auto;
+      padding: 1rem 4rem;
+    
+      border-radius: 1rem;
+    
+      font-size: 1.25rem;
+    
+      &:disabled {
+        background-color: grey;
+        color: rgb(51, 51, 51);
+      }
+    }
+  }
 }

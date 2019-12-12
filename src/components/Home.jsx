@@ -20,24 +20,12 @@ const Home = () => {
     ['John Lennon', 'John Legend'],
   ];
 
-  const toggleDataOrigin = () => {
-    if (dataOrigin === 'local') {
-      dataContext.setDataOrigin('API');
-    }
-    else if (dataOrigin === 'API'){
-      dataContext.setDataOrigin('local');
-
-      /* since disabling API will only allow local lyrics, change the artists */
-      setArtists(['Frank Ocean', 'Frank Sinatra']);
-    }
-  }
-
   const createButtonLabel = (artists) => {
     let buttonLabel = '';
     artists.forEach((artist, index) => {
       buttonLabel += artist;
       if (index < numArtists - 1) {
-        buttonLabel += ' vs. '
+        buttonLabel += ' & '
       };
     });
 
@@ -46,60 +34,48 @@ const Home = () => {
 
   const createPairings = (pairingList) => {
     const pairButtons = pairingList.map((pair, index) => {
-      if (dataOrigin === 'local') {
-        return (
-          <li key={index}>
-            <button onClick={()=> setArtists(pair)} disabled>
-              {createButtonLabel(pair)}
-            </button>
-          </li>
-        );
-      }
-      else {
-        return (
-          <li key={index}>
-            <button onClick={()=> setArtists(pair)}>
-              {createButtonLabel(pair)}
-            </button>
-          </li>
-        );
-      }
+      return (
+        <li key={index}>
+          <button
+            onClick={() => setArtists(pair)} className="pairs-list__option"
+          >
+            {createButtonLabel(pair)}
+          </button>
+        </li>
+      );
     });
 
-    return (<ul className="pairing-options__list">{pairButtons}</ul>);
-  }
-
-  const showPlay = (enabled) => {
-    if (enabled) {
-      return (
-        <Link to="/game">
-          <button>
-            {createButtonLabel(artists)}
-          </button>
-        </Link>
-      );
-    } else {
-      return (
-        <div>loading...</div>
-      );
-    }
+    return (<ul className="pairs-list__list">{pairButtons}</ul>);
   }
 
   return (
     <div className="home">
-    {console.log('<Home/> is rendered')}
+      {console.log('<Home/> is rendered')}
 
-      <h1>HOME</h1>
-      <button onClick={() => toggleDataOrigin()}>
-        data origin: {dataContext.dataOrigin}
-      </button>
+      <h1 className="home--title">Which Frank?</h1>
 
+      <p className="play-game__prompt">
+        How well do you know music?
+      </p>
+      <p className="play-game__instructions">
+        Your objective is simple: figure out who sang the lyric!
+      </p>
+      <p className="play-game__lyrics-source">With songs by</p>
+      <p className="play-game__active-artists">{createButtonLabel(artists)}</p>
 
-      <h3>Change Artists</h3>
-      {createPairings(artistPairings)}
+      {
+        dataOrigin === "API" &&
+        <div className="pairs-list">
+          <h3 className="pairs-list__title">Change Artists</h3>
+          {createPairings(artistPairings)}
+        </div>
+      }
 
-      <h2>Play</h2>
-      {showPlay(enablePlay)}
+      <Link to="/game" className="play-game__link">
+        <button className="play-game__link-button" disabled={!enablePlay}>
+          Play
+        </button>
+      </Link>
     </div>
   );
 }
