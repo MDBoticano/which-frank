@@ -59,7 +59,8 @@ const App = () => {
 
         /* use helper function to retreive data */
         setEnablePlay(false);
-        const apiSnippets = await makeCustomLyrics(artists, numSongs, API_KEY);
+        // const apiSnippets = await makeCustomLyrics(artists, numSongs, API_KEY);
+        const apiSnippets = JSONLyrics.FrankLyrics;
 
         // If the function fails to retrieve anything, default to local lyrics
         if (apiSnippets.length === 0) {

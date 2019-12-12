@@ -20,86 +20,79 @@ const Home = () => {
     ['John Lennon', 'John Legend'],
   ];
 
-  const toggleDataOrigin = () => {
-    if (dataOrigin === 'local') {
-      dataContext.setDataOrigin('API');
-    }
-    else if (dataOrigin === 'API'){
-      dataContext.setDataOrigin('local');
-
-      /* since disabling API will only allow local lyrics, change the artists */
-      setArtists(['Frank Ocean', 'Frank Sinatra']);
-    }
-  }
-
   const createButtonLabel = (artists) => {
     let buttonLabel = '';
     artists.forEach((artist, index) => {
       buttonLabel += artist;
       if (index < numArtists - 1) {
-        buttonLabel += ' vs. '
+        buttonLabel += ' & '
       };
     });
 
     return buttonLabel;
   };
 
-  const createPairings = (pairingList) => {
-    const pairButtons = pairingList.map((pair, index) => {
-      if (dataOrigin === 'local') {
-        return (
-          <li key={index}>
-            <button onClick={()=> setArtists(pair)} disabled>
-              {createButtonLabel(pair)}
-            </button>
-          </li>
-        );
-      }
-      else {
-        return (
-          <li key={index}>
-            <button onClick={()=> setArtists(pair)}>
-              {createButtonLabel(pair)}
-            </button>
-          </li>
-        );
-      }
-    });
-
-    return (<ul className="pairing-options__list">{pairButtons}</ul>);
+  const isPairActive = (pair) => {
+    const matches = artists.every(artist => pair.includes(artist));
+    if (matches) { return "pairs-list__option--active" }
   }
 
-  const showPlay = (enabled) => {
-    if (enabled) {
+  const createPairings = (pairingList) => {
+    const optionsDisabled = dataOrigin === 'local';  
+
+    const pairButtons = pairingList.map((pair, index) => {
+      const buttonClass = `pairs-list__option ${isPairActive(pair)}`
       return (
-        <Link to="/game">
-          <button>
-            {createButtonLabel(artists)}
+        <li key={index}>
+          <button
+            onClick={() => setArtists(pair)} 
+            className={buttonClass}
+            disabled={optionsDisabled}
+          >
+            {createButtonLabel(pair)}
           </button>
-        </Link>
+        </li>
       );
-    } else {
-      return (
-        <div>loading...</div>
-      );
-    }
+    });
+
+    return (
+      <>
+        <ul className="pairs-list__list">
+          {pairButtons}
+        
+        </ul>
+        {optionsDisabled && 
+          <div className="pairs-list__list-label">
+            Musixmatch API connection lost. Using default lyrics.
+          </div>
+        }
+      </>
+    );
   }
 
   return (
     <div className="home">
-    {console.log('<Home/> is rendered')}
+      {console.log('<Home/> is rendered')}
 
-      <h1>HOME</h1>
-      <button onClick={() => toggleDataOrigin()}>
-        data origin: {dataContext.dataOrigin}
-      </button>
+      <header className="home-header">
+        <h1 className="home-header__title">Which Frank?</h1>
+        <p className="home-header__subtitle">
+          a lyric guessing game
+        </p>
+      </header>
 
+      <div className="pairs-list">
+        <div className="pairs-list__title-box">
+          <h3 className="pairs-list__title">Guess lyrics from</h3>
+        </div>
+        {createPairings(artistPairings)}
+      </div>
 
-      <h3>Change Artists</h3>
-      {createPairings(artistPairings)}
-
-      <h2>Play</h2>
-      {showPlay(enablePlay)}
+      <Link to="/game" className="play-game__link">
+        <button className="play-game__link-button" disabled={!enablePlay}>
+          Play
+        </button>
+      </Link>
     </div>
   );
 }

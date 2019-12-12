@@ -1,29 +1,242 @@
+@import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+
+:root {
+  --app-max-width: 840px;
+  --btn-bg: hsl(0, 0%, 82%);
+  --btn-bg--active: hsl(0, 0%, 10%);
+  --btn-bg--disabled: hsl(0, 0%, 40%);
+  --btn-bg--hover: hsl(0, 0%, 100%);
+  --btn-text: hsl(0, 0%, 29%);
+  --btn-text--active: hsl(0, 0%, 99%);
+  --btn-text--disabled: hsl(0, 0%, 67%);
+  --btn-text--hover: hsl(0, 0%, 0%);
+  --btn-border: none;
+  --btn-border--active: ;
+  --btn-border--disabled: ;
+  --btn-border--hover: solid 4px hsl(0, 0%, 6%);
+}
+
 @mixin reset-box {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 @mixin no-list-style {
   list-style: none;
 }
 
+@mixin primary-font {
+  font-family: 'Quicksand', Arial, Helvetica, sans-serif;
+}
+
+@mixin app-page {
+  width: 100%;
+
+  padding: 2rem 0;
+
+  background-color: hsl(0, 0%, 18%);
+  box-shadow: 4px 4px 16px hsla(240, 0%, 10%, 0.8);
+}
+
+@mixin flex-col-center-across {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@mixin flex-col-center-along {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@mixin flex-col-center-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// body > * {
+//   box-sizing: border-box;
+//   border: solid 1px rgb(239, 111, 243);
+// }
+// body > * > * {
+//   box-sizing: border-box;
+//   border: solid 1px rgb(80, 236, 184);
+// }
+// body > * > * > *  {
+//   box-sizing: border-box;
+//   border: solid 1px rgb(255, 99, 71);
+// }
+// body > * > * > * > * {
+//   box-sizing: border-box;
+//   border: solid 1px rgb(107, 142, 35);
+// }
+
+
 body {
   @include reset-box;
+  @include primary-font;
+
+  padding: 0 1rem;
+
+  background-color: hsl(0, 0%, 41%);
 }
 
 .app {
   @include reset-box;
+  box-sizing: border-box;
 
-  padding: 2em;
-
-
+  max-width: var(--app-max-width);
   min-height: 100vh;
 
-  background-color: rgb(255, 218, 196);
+  margin-left: auto;
+  margin-right: auto;
 
+  padding-top: 2rem;
 }
 
-.pairing-options__list {
+
+/* home */
+.home {
+  @include app-page;
+  @include flex-col-center-across;
+
+  &-header {
+    @include reset-box;
+    @include flex-col-center-center;
+
+    width: 100%;
+
+    &__title {
+      @include reset-box;
+      font-size: 3rem;
+      color: white;
+    }
+    &__subtitle {
+      @include reset-box;
+      font-size: 1.25rem;
+      color: white;
+    }
+  }
+}
+
+.pairs-list {
   @include reset-box;
-  @include no-list-style;
+
+  margin-top: 1rem;
+
+  background-color: hsl(0, 0%, 60%);
+  box-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.4);
+
+  &__title-box {
+    @include reset-box;
+    @include flex-col-center-center;
+
+    width: 100%;
+    height: 2.5rem;
+    background-color: hsl(0, 0%, 90%);
+    box-shadow: 0 2px 12px hsla(0, 0%, 0%, 0.4);
+  }
+
+  &__title {
+    @include reset-box;
+  
+    text-align: center;
+    font-size: 1.25rem;
+
+    color: hsl(0, 0%, 6%);
+  }
+
+  &__list {
+    @include reset-box;
+    @include no-list-style;
+
+    padding: 0.5rem 1rem;
+
+    &-label {
+      @include reset-box;
+
+      padding: 1rem;
+
+      background-color: hsl(0, 0%, 10%);
+      color: white;
+
+      text-align: center;
+    }
+  }
+
+  &__option {
+    @include primary-font;
+  
+    margin: 0.5rem 0;
+    padding: 0.75rem 2rem;
+  
+    width: 100%;
+  
+    border: none;
+    border: var(--btn-border);
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+
+    font-size: 1.25rem;
+
+    &--active {
+      border: var(--btn-border--active);
+      background-color: var(--btn-bg--active);
+      color: var(--btn-text--active);
+
+      font-weight: bold;
+    }
+
+    &:disabled {
+      border: var(--btn-border--disabled);
+      background-color: var(--btn-bg--disabled);
+      color: var(--btn-text--disabled);
+    }
+  }
 }
+
+.play-game {
+
+  &__link {
+    @include reset-box;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    
+
+    display: flex;
+    justify-content: center;
+
+    text-decoration: none;
+
+    &-button {  
+      @include primary-font;
+        
+      padding: 1rem 4rem;
+    
+      border: var(--btn-border);
+
+      font-size: 1.5rem;
+      font-weight: bold;
+
+      &:hover {
+        cursor: pointer;
+
+        background-color: var(--btn-bg--hover);
+        color: var(--btn-text--hover);
+
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+      }
+    
+      &:disabled {
+        background-color: var(--btn-bg--disabled);
+        color: var(--btn-text--disabled);
+      }
+    }
+  }
+}
+
