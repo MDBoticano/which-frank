@@ -7,7 +7,8 @@ import DataContext from '../DataContext';
 const Home = () => {
   /* Context values */
   const dataContext = useContext(DataContext);
-  const dataOrigin = dataContext.dataOrigin;
+  // const dataOrigin = dataContext.dataOrigin;
+  const dataOrigin = 'local';
   const artists = dataContext.artists;
   const numArtists = artists.length;
   const setArtists = dataContext.setArtists;
@@ -33,11 +34,15 @@ const Home = () => {
   };
 
   const createPairings = (pairingList) => {
+    const optionsDisabled = dataOrigin === 'local';
+
     const pairButtons = pairingList.map((pair, index) => {
       return (
         <li key={index}>
           <button
-            onClick={() => setArtists(pair)} className="pairs-list__option"
+            onClick={() => setArtists(pair)} 
+            className="pairs-list__option"
+            disabled={optionsDisabled}
           >
             {createButtonLabel(pair)}
           </button>
@@ -45,7 +50,14 @@ const Home = () => {
       );
     });
 
-    return (<ul className="pairs-list__list">{pairButtons}</ul>);
+    if (optionsDisabled) {
+      return (
+        <ul className="pairs-list__list">
+          {pairButtons}
+          <div>Musixmatch API disabled. Using default lyrics.</div>
+        </ul>
+      );
+    }
   }
 
   return (
@@ -55,21 +67,15 @@ const Home = () => {
       <h1 className="home--title">Which Frank?</h1>
 
       <p className="play-game__prompt">
-        How well do you know music?
+        a lyric guessing game
       </p>
-      <p className="play-game__instructions">
-        Your objective is simple: figure out who sang the lyric!
-      </p>
-      <p className="play-game__lyrics-source">With songs by</p>
-      <p className="play-game__active-artists">{createButtonLabel(artists)}</p>
 
-      {
-        dataOrigin === "API" &&
-        <div className="pairs-list">
-          <h3 className="pairs-list__title">Change Artists</h3>
-          {createPairings(artistPairings)}
+      <div className="pairs-list">
+        <div className="pairs-list__title-box">
+          <h3 className="pairs-list__title">Guess lyrics from</h3>
         </div>
-      }
+        {createPairings(artistPairings)}
+      </div>
 
       <Link to="/game" className="play-game__link">
         <button className="play-game__link-button" disabled={!enablePlay}>
