@@ -7,8 +7,7 @@ import DataContext from '../DataContext';
 const Home = () => {
   /* Context values */
   const dataContext = useContext(DataContext);
-  // const dataOrigin = dataContext.dataOrigin;
-  const dataOrigin = 'local';
+  const dataOrigin = dataContext.dataOrigin;
   const artists = dataContext.artists;
   const numArtists = artists.length;
   const setArtists = dataContext.setArtists;
@@ -33,15 +32,21 @@ const Home = () => {
     return buttonLabel;
   };
 
+  const isPairActive = (pair) => {
+    const matches = artists.every(artist => pair.includes(artist));
+    if (matches) { return "pairs-list__option--active" }
+  }
+
   const createPairings = (pairingList) => {
-    const optionsDisabled = dataOrigin === 'local';
+    const optionsDisabled = dataOrigin === 'local';  
 
     const pairButtons = pairingList.map((pair, index) => {
+      const buttonClass = `pairs-list__option ${isPairActive(pair)}`
       return (
         <li key={index}>
           <button
             onClick={() => setArtists(pair)} 
-            className="pairs-list__option"
+            className={buttonClass}
             disabled={optionsDisabled}
           >
             {createButtonLabel(pair)}
@@ -50,25 +55,31 @@ const Home = () => {
       );
     });
 
-    if (optionsDisabled) {
-      return (
+    return (
+      <>
         <ul className="pairs-list__list">
           {pairButtons}
-          <div>Musixmatch API disabled. Using default lyrics.</div>
+        
         </ul>
-      );
-    }
+        {optionsDisabled && 
+          <div className="pairs-list__list-label">
+            Musixmatch API connection lost. Using default lyrics.
+          </div>
+        }
+      </>
+    );
   }
 
   return (
     <div className="home">
       {console.log('<Home/> is rendered')}
 
-      <h1 className="home--title">Which Frank?</h1>
-
-      <p className="play-game__prompt">
-        a lyric guessing game
-      </p>
+      <header className="home-header">
+        <h1 className="home-header__title">Which Frank?</h1>
+        <p className="home-header__subtitle">
+          a lyric guessing game
+        </p>
+      </header>
 
       <div className="pairs-list">
         <div className="pairs-list__title-box">
