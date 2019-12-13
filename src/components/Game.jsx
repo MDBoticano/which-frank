@@ -13,11 +13,13 @@ const Game = () => {
   const snippets = dataContext.snippets;
   const numSnippets = snippets.length;
   const defaultOrder = getOrderedIndices(numSnippets);
-
+  const createButtonLabel = dataContext.createButtonLabel;
+  
   /* Instead of using context artist values, use artist names frm snippets
-   * This is because the query may not match the spelling used in the API
-   */ 
-  const artists = getUniqueValues(snippets, 'artist_name');
+  * This is because the query may not match the spelling used in the API
+  */ 
+ const artists = getUniqueValues(snippets, 'artist_name');
+ const numArtists = artists.length;
 
   const [gameScore, setGameScore] = useState(0);
   const [snipIndex, setSnipIndex] = useState(0);
@@ -30,6 +32,7 @@ const Game = () => {
     setSnipOrder(newOrder);
   }, [snippets, numSnippets]);
 
+
   const submitGuess = (guess) => {
     const currentArtist = snippets[snipOrder[snipIndex]].artist_name;
     if (guess === currentArtist) {
@@ -41,7 +44,11 @@ const Game = () => {
   const makeGuessButtons = (artists) => {
     const buttons = artists.map((artist) => {
       return (
-        <button key={artist} onClick={() => submitGuess(artist)}>
+        <button 
+          onClick={() => submitGuess(artist)}
+          className="game-body-guesses__buttons"
+          key={artist}
+        >
           {artist}
         </button>
       );
@@ -51,22 +58,43 @@ const Game = () => {
 
   const displaySnippet = (snip) => {
     return (
-      <div className="snippet">
-        <p>{snip.snippet}</p>
-        {makeGuessButtons(artists)}
+      <div className="game-body">
+        <div className="game-body-score">
+          <p className="game-body-score__label">Score</p>
+          <p className="game-body-score__score">{gameScore}</p>
+        </div>
+        <div className="game-body-snippets">
+          <p className="game-body-snippets__snippet">{snip.snippet}</p>
+        </div>
+        <div className="game-body-guesses">
+            {makeGuessButtons(artists)}
+        </div>
       </div>
     );
   }
 
   const displayScorePrompt = () => {
     return (
-      <div className="score-prompt">
-        <p>That's all of them!</p>
-        <Link to="/score">
-        <button onClick={() => dataContext.setScore(gameScore)}>
-          View Score
-        </button>
-      </Link>
+      <div className="game-body">
+        <div className="game-body-score">
+          <p className="game-body-score__label">Score</p>
+          <p className="game-body-score__score">{gameScore}</p>
+        </div>
+        <div className="game-body-snippets">
+          <p className="game-body-snippets__snippet">
+            That's all of them!
+          </p>
+        </div>
+        <div className="game-body-next">
+          <Link to="/score" className="game-body-next__link">
+            <button
+              onClick={() => dataContext.setScore(gameScore)}
+              className="game-body-next__button"
+            >
+              View Score
+            </button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -75,8 +103,12 @@ const Game = () => {
     <div className="game">
       {console.log('<Game/> is rendered')}
 
-      <h1>GAME</h1>
-      <h4>score: {gameScore}</h4>
+      <header className="game-header">
+        <h1 className="game-header__title">Which Frank?</h1>
+        <p className="game-header__subtitle">
+          {createButtonLabel(artists)}
+        </p>
+      </header>
 
       {
         snipIndex < numSnippets ? 
