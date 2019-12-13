@@ -78,7 +78,7 @@ const Home = () => {
 
       <Link to="/game" className="play-game__link">
         <button className="play-game__link-button" disabled={!enablePlay}>
-          Play
+          {enablePlay ? `Play` : `Loading...`}
         </button>
       </Link>
     </div>
