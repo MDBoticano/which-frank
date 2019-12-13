@@ -365,3 +365,8 @@ body {
     }
   }
 }
+
+.score {
+  @include reset-box;
+  @include app-page;
+}

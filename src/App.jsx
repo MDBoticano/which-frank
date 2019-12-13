@@ -79,6 +79,20 @@ const App = () => {
     getAPISnippets();
   }, [API_KEY, dataOrigin, artists, numSongs, setEnablePlay]);
 
+  const createButtonLabel = (artists) => {
+    const numArtists = artists.length;
+
+    let buttonLabel = '';
+    artists.forEach((artist, index) => {
+      buttonLabel += artist;
+      if (index < numArtists - 1) {
+        buttonLabel += ' & '
+      };
+    });
+
+    return buttonLabel;
+  };
+
   const initialContext = {
     dataOrigin: dataOrigin,
     setDataOrigin: setDataOrigin,
@@ -89,6 +103,7 @@ const App = () => {
     setArtists: setArtists,
     snippets: snippets,
     enablePlay: enablePlay,
+    createButtonLabel: createButtonLabel,
   }
 
   return (

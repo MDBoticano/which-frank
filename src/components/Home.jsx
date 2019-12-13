@@ -9,9 +9,9 @@ const Home = () => {
   const dataContext = useContext(DataContext);
   const dataOrigin = dataContext.dataOrigin;
   const artists = dataContext.artists;
-  const numArtists = artists.length;
   const setArtists = dataContext.setArtists;
   const enablePlay = dataContext.enablePlay;
+  const createButtonLabel = dataContext.createButtonLabel;
 
   const artistPairings = [
     ['Frank Ocean', 'Frank Sinatra'],
@@ -19,18 +19,6 @@ const Home = () => {
     ['Jack White', 'Jack Black'],
     ['John Lennon', 'John Legend'],
   ];
-
-  const createButtonLabel = (artists) => {
-    let buttonLabel = '';
-    artists.forEach((artist, index) => {
-      buttonLabel += artist;
-      if (index < numArtists - 1) {
-        buttonLabel += ' & '
-      };
-    });
-
-    return buttonLabel;
-  };
 
   const isPairActive = (pair) => {
     const matches = artists.every(artist => pair.includes(artist));

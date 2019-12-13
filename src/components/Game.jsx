@@ -13,6 +13,7 @@ const Game = () => {
   const snippets = dataContext.snippets;
   const numSnippets = snippets.length;
   const defaultOrder = getOrderedIndices(numSnippets);
+  const createButtonLabel = dataContext.createButtonLabel;
   
   /* Instead of using context artist values, use artist names frm snippets
   * This is because the query may not match the spelling used in the API
@@ -31,17 +32,6 @@ const Game = () => {
     setSnipOrder(newOrder);
   }, [snippets, numSnippets]);
 
-  const createButtonLabel = (artists) => {
-    let buttonLabel = '';
-    artists.forEach((artist, index) => {
-      buttonLabel += artist;
-      if (index < numArtists - 1) {
-        buttonLabel += ' & '
-      };
-    });
-
-    return buttonLabel;
-  };
 
   const submitGuess = (guess) => {
     const currentArtist = snippets[snipOrder[snipIndex]].artist_name;
