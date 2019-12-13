@@ -240,3 +240,128 @@ body {
   }
 }
 
+/* Game */
+.game {
+  @include reset-box;
+  @include app-page;
+  @include flex-col-center-across;
+
+  padding-left: 2rem;
+  padding-right: 2rem;
+
+  &-header {
+    @include reset-box;
+    @include flex-col-center-center;
+
+    width: 100%;
+    color: white;
+
+    &__title {
+      @include reset-box;
+      font-size: 2rem;
+    }
+
+    &__subtitle {
+      @include reset-box;
+    }
+  }
+}
+
+.game-body {
+  @include reset-box;
+  @include flex-col-center-across;
+
+  margin-top: 1.5rem;
+
+  width: 100%;
+
+  background-color: hsl(0, 0%, 29%);
+
+  &-score {
+    @include reset-box;
+    @include flex-col-center-across;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    &__label {
+      @include reset-box;
+      font-size: 1rem;
+      text-align: center;
+
+      color: white;
+    }
+
+    &__score {
+      @include reset-box;
+      font-size: 2rem;
+      color: white;
+    }
+  }
+
+  &-snippets {
+    @include flex-col-center-center;
+    min-height: 12rem;
+    width: 100%;
+    background-color: hsl(0, 0%, 100%);
+
+    &__snippet {
+      @include reset-box;
+
+      padding-left: 2rem;
+      padding-right: 2rem;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+
+      font-size: 2rem;
+      font-weight: bold;
+
+      text-align: center;
+    }
+  }
+
+  &-guesses {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    &__buttons {
+      @include reset-box;
+
+      cursor: pointer;
+
+      padding: 0.75rem;
+
+      background-color: var(--btn-bg);
+      color: var(--btn-text-active);
+      font-size: 1.5rem;
+    }
+  }
+
+  &-next {
+    @include reset-box;
+    width: 100%;
+
+    &__link {
+      color: var(--btn-text-active);
+      
+    }
+
+    &__button {
+      @include reset-box;
+      width: 100%;
+
+      cursor: pointer;
+
+      padding: 0.75rem;
+      background-color: var(--btn-bg);
+      font-size: 1.5rem;
+    }
+  }
+}
