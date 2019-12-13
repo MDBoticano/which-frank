@@ -8,9 +8,13 @@ const ResetButton = (props) => {
   const dataContext = useContext(DataContext);
   
   return (
-    <Link to={props.target}>
-      <button onClick={() => dataContext.setScore(0)}>
-        {props.label}
+    <Link to={props.target} className="score-next__link">
+      <button
+        onClick={() => dataContext.setScore(0)}
+        className="score-next__button"
+      >
+        <p className="score-next__button-label">{props.label}</p>
+        <p className="score-next__button-sublabel">{props.sublabel}</p>
       </button>
     </Link>
   );
@@ -30,9 +34,27 @@ const Score = () => {
         </p>
       </header>
 
-      SCORE: {dataContext.score}
-      <ResetButton target="/" label="Home" />
-      <ResetButton target="/game" label="Play Again" />
+      <div className="score-box">
+        <p className="score-box__label">Final Score</p>
+        <p className="score-box__score">{dataContext.score}</p>
+        <p className="score-box__sublabel">
+          Out of {dataContext.snippets.length}
+        </p>
+        
+      </div>
+
+      <div className="score-next">
+        <div className="score-next__buttons">
+          <ResetButton 
+            target="/" label="Home" 
+            sublabel="(pick new artists)"
+          />
+          <ResetButton
+            target="/game" label="Try Again"
+            sublabel="(same artists)"  
+          />
+        </div>
+      </div>
     </div>
   );
 }

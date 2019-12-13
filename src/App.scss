@@ -369,4 +369,67 @@ body {
 .score {
   @include reset-box;
   @include app-page;
+
+  &-box {
+    @include reset-box;
+    @include flex-col-center-across;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 2rem 0;
+
+    background-color: rgb(14, 14, 14);
+
+    &__label {
+      @include reset-box;
+      font-size: 1rem;
+      text-align: center;
+
+      color: white;
+    }
+
+    &__sublabel {
+      @include reset-box;
+      font-size: 1.5rem;
+      text-align: center;
+
+      color: white;
+    }
+
+    &__score {
+      @include reset-box;
+      font-size: 4rem;
+      line-height: 6rem;
+      font-weight: bold;
+      color: white;
+    }
+  }
+
+  &-next {
+    @include reset-box;
+    @include flex-col-center-across;
+
+
+    &__link {
+      color: var(--btn-text-active);
+    }
+
+    &__button {
+      cursor: pointer;
+      padding: 0.75rem;
+      
+      background-color: var(--btn-bg);
+
+      margin: 0.5rem;
+
+      &-label {
+        @include reset-box;
+        font-size: 2rem;
+      }
+
+      &-sublabel {
+        @include reset-box;
+        font-size: 1rem;
+      }
+    }
+  }
 }
