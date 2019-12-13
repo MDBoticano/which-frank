@@ -19,7 +19,6 @@ const Game = () => {
   * This is because the query may not match the spelling used in the API
   */ 
  const artists = getUniqueValues(snippets, 'artist_name');
- const numArtists = artists.length;
 
   const [gameScore, setGameScore] = useState(0);
   const [snipIndex, setSnipIndex] = useState(0);
