@@ -2,7 +2,7 @@
 
 :root {
   --app-max-width: 840px;
-  --btn-bg: hsl(0, 0%, 82%);
+  --btn-bg: hsl(0, 0%, 91%);
   --btn-bg--active: hsl(0, 0%, 10%);
   --btn-bg--disabled: hsl(0, 0%, 40%);
   --btn-bg--hover: hsl(0, 0%, 100%);
@@ -57,24 +57,6 @@
   align-items: center;
   justify-content: center;
 }
-
-// body > * {
-//   box-sizing: border-box;
-//   border: solid 1px rgb(239, 111, 243);
-// }
-// body > * > * {
-//   box-sizing: border-box;
-//   border: solid 1px rgb(80, 236, 184);
-// }
-// body > * > * > *  {
-//   box-sizing: border-box;
-//   border: solid 1px rgb(255, 99, 71);
-// }
-// body > * > * > * > * {
-//   box-sizing: border-box;
-//   border: solid 1px rgb(107, 142, 35);
-// }
-
 
 body {
   @include reset-box;
@@ -235,6 +217,7 @@ body {
       &:disabled {
         background-color: var(--btn-bg--disabled);
         color: var(--btn-text--disabled);
+        cursor: wait;
       }
     }
   }

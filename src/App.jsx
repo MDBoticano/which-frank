@@ -23,7 +23,7 @@ const App = () => {
   const API_KEY = process.env.REACT_APP_MUSIXMATCH_API_KEY;
 
   const [score, setScore] = useState(0);
-  const [dataOrigin, setDataOrigin] = useState('local');
+  const [dataOrigin, setDataOrigin] = useState('API');
   const [artists, setArtists] = useState(['Frank Ocean', 'Frank Sinatra']);
   const [snippets, setSnippets] = useState(JSONLyrics.FrankLyrics);
   const [numSongs] = useState(5); // possible setting, hence state
@@ -59,8 +59,8 @@ const App = () => {
 
         /* use helper function to retreive data */
         setEnablePlay(false);
-        // const apiSnippets = await makeCustomLyrics(artists, numSongs, API_KEY);
-        const apiSnippets = JSONLyrics.FrankLyrics;
+        const apiSnippets = await makeCustomLyrics(artists, numSongs, API_KEY);
+        // const apiSnippets = JSONLyrics.FrankLyrics;
 
         // If the function fails to retrieve anything, default to local lyrics
         if (apiSnippets.length === 0) {
